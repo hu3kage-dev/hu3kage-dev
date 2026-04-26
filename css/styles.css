@@ -1,7 +1,4 @@
-/* =========================
-   BASE (INDEX + DRAFT)
-========================= */
-
+/* index / draftconfig */
 body {
   font-family: Arial, sans-serif;
   background-color: #111;
@@ -12,7 +9,7 @@ body {
 
 h1 {
   margin-bottom: 20px;
-  color: #a855f7; /* Roxo */
+  color: #a855f7;
 }
 
 .game-modes {
@@ -33,13 +30,13 @@ h1 {
 .mode-image {
   width: 100%;
   height: auto;
-  border: 2px solid #3b82f6; /* Azul */
+  border: 2px solid #3b82f6;
   border-radius: 10px;
   margin-bottom: 10px;
 }
 
 .draft-btn {
-  background-color: #22c55e; /* Verde */
+  background-color: #22c55e;
   color: white;
   padding: 10px 20px;
   border: none;
@@ -52,7 +49,7 @@ h1 {
 }
 
 .disabled-btn {
-  background-color: #6b7280; /* Cinza */
+  background-color: #6b7280;
   color: #d1d5db;
   padding: 10px 20px;
   border: none;
@@ -83,10 +80,7 @@ input {
   margin: 5px;
 }
 
-/* =========================
-   DRAFT CONFIG GRID
-========================= */
-
+/* draftconfig */
 .config-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -120,7 +114,6 @@ input {
   overflow: hidden;
 }
 
-/* corpo do bloco 2: dois lados lado a lado */
 .b2-body {
   display: flex;
   flex: 1;
@@ -129,7 +122,6 @@ input {
   text-align: left;
 }
 
-/* coluna esquerda: labels + inputs + random */
 .b2-left {
   margin-top: 20px;
   display: flex;
@@ -141,7 +133,7 @@ input {
 }
 
 .b2-left .btn-iniciar-draft {
-  margin-top: auto;  /* empurra para o fundo */
+  margin-top: auto;
   width: 97%;
 }
 
@@ -151,7 +143,6 @@ input {
   margin-bottom: 2px;
 }
 
-/* linha com label + input numérico */
 .b2-field {
   display: grid;
   grid-template-columns: auto 140px;
@@ -171,7 +162,6 @@ input {
   box-sizing: border-box;
 }
 
-/* coluna direita: scroll de nomes + botão draft */
 .b2-right {
   flex: 1;
   display: flex;
@@ -183,6 +173,7 @@ input {
 
 .players-scroll-box {
   flex: 1;
+  max-height: 140px;
   overflow-y: auto;
   border: 1px solid #444;
   padding: 8px;
@@ -208,7 +199,28 @@ input {
 .config-block h3 {
   text-align: center;
   margin-top: 0;
-  color: #a855f7; /* Roxo */
+  color: #a855f7;
+}
+
+/* blocos 3 e 4 */
+#groupsContainer {
+  text-align: left;
+}
+
+#groupsContainer > div {
+  background: #333;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+#groupsContainer div div {
+  margin-left: 15px;
+}
+
+#producerContainer,
+#musicContainer {
+  margin-top: 10px;
 }
 
 .scroll-box {
@@ -235,34 +247,9 @@ input {
   flex: 1;
 }
 
-/* =========================
-   DRAFT (GRUPOS)
-========================= */
 
-#groupsContainer {
-  text-align: left;
-}
-
-#groupsContainer > div {
-  background: #333;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-}
-
-#groupsContainer div div {
-  margin-left: 15px;
-}
-
-#producerContainer,
-#musicContainer {
-  margin-top: 10px;
-}
-
-/* =========================
-   GAME - PLAYER ROW
-========================= */
-
+/* draftgame */
+/* player row */
 .playerRow {
   display: flex;
   align-items: flex-start;
@@ -283,7 +270,7 @@ input {
   flex-shrink: 0;
 }
 
-/* container geral dos blocos */
+/* player blocks */
 .playerBlocks {
   display: flex;
   flex: 1;
@@ -294,18 +281,15 @@ input {
   min-width: 0;
 }
 
-/* destaque jogador atual */
+/* jogador atual */
 .activePlayer {
   background: rgba(255, 255, 0, 0.1);
 }
 
-/* =========================
-   BLOCOS
-========================= */
-
+/* blocks (board) */
 .block {
   display: flex;
-  flex-direction: column; /* título em cima */
+  flex-direction: column;
   align-items: stretch;
   border: 2px solid;
   padding: 8px;
@@ -364,7 +348,6 @@ input {
   gap: 4px;
 }
 
-/* faz os slots ficarem lado a lado */
 .block {
   flex-wrap: wrap;
 }
@@ -377,7 +360,7 @@ input {
   overflow: visible;
 }
 
-/* CORES */
+/* blocks colour coded lyrics */
 .idolBlock {
   border-color: yellow;
 }
@@ -398,16 +381,13 @@ input {
   width: 100%;
 }
 
-/* =========================
-   SLOTS
-========================= */
-
+/* slots */
 .locked {
   opacity: 0.6;
   border: 2px solid red;
 }
 
-/* cores por tipo */
+/* slots colour coded lyrics */
 .idolBlock .slot {
   border-color: yellow;
 }
@@ -420,10 +400,7 @@ input {
   border-color: purple;
 }
 
-/* =========================
-   CARDS
-========================= */
-
+/* draft cards */
 .card {
   width: 100%;
   height: 100%;
@@ -442,22 +419,20 @@ input {
 .playerBlocks .card {
   width: 90px;
   height: 120px;
-  border: none; /* Remove border para mostrar a borda do slot */
+  border: none;
 }
 
 .card:active {
   cursor: grabbing;
 }
 
-/* estado bloqueado */
+/* bloqueado */
 .card.disabled {
   opacity: 0.3;
   pointer-events: none;
 }
 
-/* =========================
-   POOL
-========================= */
+/* Pool */
 
 #pool {
   margin-top: 20px;
@@ -474,10 +449,6 @@ input {
   height: 200px;
 }
 
-/* =========================
-   RESPONSIVO
-========================= */
-
 @media (max-width: 900px) {
   .playerRow {
     flex-direction: column;
@@ -488,7 +459,7 @@ input {
     flex-wrap: wrap;
   }
 }
-/* CARD COM IMAGEM */
+/* imagens do card */
 .card {
   width: 100%;
   height: 100%;
@@ -510,7 +481,7 @@ input {
   object-position: top;
 }
 
-/* nome por cima */
+/* card label */
 .cardLabel {
   position: absolute;
   bottom: 0;
@@ -542,7 +513,7 @@ input {
   white-space: nowrap;
 }
 
-/* Color Code para tipos de cards */
+/* draft cards colour coded lyrics */
 .card-idol {
   border: 3px solid yellow;
   box-shadow: inset 0 0 8px rgba(255, 255, 0, 0.3);
@@ -558,10 +529,7 @@ input {
   box-shadow: inset 0 0 8px rgba(128, 0, 128, 0.3);
 }
 
-/* =========================
-   MODAL
-========================= */
-
+/* modal */
 .modal {
   display: none;
   position: fixed;
@@ -595,12 +563,12 @@ input {
   font-size: 18px;
 }
 
-/*mode-image*/
+/* image modal */
 .mode-image {
   width: 300px;
   height: 300px;
   object-fit: cover;
-  object-position: top; /* garante corte central */
+  object-position: top;
   border: 2px solid #3b82f6;
   border-radius: 10px;
 }
