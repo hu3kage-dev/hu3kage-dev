@@ -92,15 +92,15 @@ function iniciarDrag(e, item, origem, playerIndex = null, slotIndex = null) {
   draggedItem = item;
   draggedElement = e.currentTarget;
   dragOrigin = origem;
-  // Criar payload
+  //criar payload
   if (origem === "pool") {
     dragPayload = { ...item, fromPool: true };
   } else {
     dragPayload = { ...item, fromPlayer: playerIndex, fromIndex: slotIndex };
   }
-  // Criar ghost card que segue o mouse
+  //criar ghost card que segue o mouse
   ghostCard = criarGhostCard(draggedElement);
-  // Rastrear movimento do mouse
+  //rastrear movimento do mouse
   document.addEventListener("mousemove", rastrearDrag);
   document.addEventListener("mouseup", finalizarDrag);
 }
@@ -117,20 +117,20 @@ function finalizarDrag(e) {
   if (!ghostCard) return;
   document.removeEventListener("mousemove", rastrearDrag);
   document.removeEventListener("mouseup", finalizarDrag);
-  // Remove ghost card
+  //remove ghost card
   document.body.removeChild(ghostCard);
   ghostCard = null;
-  // Verifica qual elemento está sob o cursor
+  //verifica qual elemento está sob o cursor
   const elementoAlvo = document.elementFromPoint(e.clientX, e.clientY);
   if (elementoAlvo) {
-    // Procura o slot ou pool mais próximo
+    //procura o slot ou pool mais próximo
     let slot = elementoAlvo.closest(".slot");
     let poolDiv = elementoAlvo.closest("#pool");
     if (slot) {
-      // Drop em um slot
+      //drop em um slot
       executarDropNoSlot(slot, dragPayload);
     } else if (poolDiv) {
-      // Drop no pool (devolve item)
+      //drop no pool (devolve item)
       executarDropNoPool(dragPayload);
     }
   }
@@ -161,7 +161,7 @@ function executarDropNoSlot(slot, data) {
   let slotsContainer = block.querySelector(".slotsContainer");
   let allSlots = Array.from(slotsContainer.querySelectorAll(".slot"));
   let slotIndex = allSlots.indexOf(slot);
-  //SWAP INTERNO
+  //swap interno (mesmo player)
   if (data.fromPlayer === playerIndex) {
     let origemLista = picks[playerIndex][tipo];
     let origemItem = origemLista[data.fromIndex];
@@ -174,7 +174,7 @@ function executarDropNoSlot(slot, data) {
     render();
     return;
   }
-  //VINDO DO POOL
+  //vindo do pool
   if (data.fromPool) {
     let itemNovo = data;
     if (getItemType(itemNovo) !== tipo) return;
@@ -291,7 +291,7 @@ function gerarOrdemCobrinha(qtdJogadores, rodadas) {
   for (let i = 0; i < qtdJogadores; i++) {
     base.push(i);
   }
-  // 2. Embaralhar a ordem base (Fisher-Yates)
+  // 2. Embaralhar a ordem base
   for (let i = base.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1));
     [base[i], base[j]] = [base[j], base[i]];
@@ -352,13 +352,13 @@ function renderPlayers() {
     nomeDiv.innerText = nome;
     let blocos = document.createElement("div");
     blocos.className = "playerBlocks";
-    //IDOLS (sempre)
+    //idols (sempre)
     blocos.appendChild(criarDropZone(playerIndex, "idol"));
-    //MUSIC (condicional)
+    //music (condicional)
     if (config.usarMusica) {
     blocos.appendChild(criarDropZone(playerIndex, "music"));
     }
-    //PRODUCER (condicional)
+    //producer (condicional)
     if (config.usarProdutor) {
     blocos.appendChild(criarDropZone(playerIndex, "producer"));
     }
@@ -385,6 +385,7 @@ function renderPool() {
   });
 }
 
+//****IMPORTANTÍSSIMA****
 //f:getCardImageCandidates
 function getCardImageCandidates(item) {
   const sanitize = (text) => text
@@ -450,13 +451,13 @@ function getCardImageSrc(item) {
 function criarCard(item, origem = "pool", playerIndex = null, slotIndex = null) {
   let card = document.createElement("div");
   card.className = "card";
-  // Função para limpar aspas extras dos dados
+  //função para limpar aspas extras dos dados
   const cleanText = (text) => {
     if (!text) return "";
     return text.replace(/\"{3}/g, '"').replace(/^["']|["']$/g, "").trim();
   };
   const itemType = getItemType(item);
-  // Adicionar classe de cor baseada no tipo
+  //type colour coded lyrics
   if (itemType === "idol") {
     card.classList.add("card-idol");
   } else if (itemType === "music") {
@@ -495,7 +496,7 @@ function criarCard(item, origem = "pool", playerIndex = null, slotIndex = null) 
   };
   let label = document.createElement("div");
   label.className = "cardLabel";
-  // Estruturar informações baseado no tipo
+  //estruturar informações baseado no tipo
   if (itemType === "idol") {
     label.innerHTML = `<div class="cardInfo">${cleanText(item.group)}</div><div class="cardName">${item.name}</div>`;
   } else if (itemType === "music") {
@@ -507,11 +508,11 @@ function criarCard(item, origem = "pool", playerIndex = null, slotIndex = null) 
   }
   card.appendChild(img);
   card.appendChild(label);
-  //DRAG CUSTOMIZADO
+  //drag customizado (apenas se não estiver locked)
   if (!item.locked) {
     card.style.cursor = "grab";
     card.addEventListener("mousedown", (e) => {
-      if (e.button === 0) { // Apenas botão esquerdo
+      if (e.button === 0) {
         iniciarDrag(e, item, origem, playerIndex, slotIndex);
       }
     });
@@ -521,9 +522,9 @@ function criarCard(item, origem = "pool", playerIndex = null, slotIndex = null) 
       }
     });
   }
-  //MODAL
+  //modal
   card.addEventListener("click", (e) => {
-    // Evita abrir modal se estiver fazendo drag
+    //evita abrir modal se estiver fazendo drag
     if (!draggedElement) {
       abrirModal(item);
     }
@@ -585,7 +586,7 @@ function encerrarTurno() {
         });
     }
     });
-  //RESET DO TURNO
+  //reset do turno
   escolhaDoTurno = null;
   jogouNoTurno = false;
   turno++;
@@ -672,15 +673,15 @@ function verificarFimDoJogo() {
 function todosBoardsCompletos() {
   for (let i = 0; i < jogadores.length; i++) {
     if (!picks[i]) return false;
-    // Idols: sempre obrigatório (conforme config.integrantes)
+    //idols (obrigatório)
     let idols = picks[i].idol.filter(x => x).length;
     if (idols < config.integrantes) return false;
-    // Música: obrigatório se estiver ativado na config
+    //musicas (situacional)
     if (config.usarMusica) {
       let temMusica = picks[i].music.some(x => x);
       if (!temMusica) return false;
     }
-    // Produtor: obrigatório se estiver ativado na config
+    //produtores (situacional)
     if (config.usarProdutor) {
       let temProdutor = picks[i].producer.some(x => x);
       if (!temProdutor) return false;

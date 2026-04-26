@@ -1,3 +1,9 @@
+//variáveis
+let filtroGeracao = {
+  gen4: true,
+  gen5: true
+};
+
 //f:irParaDraft
 function irParaDraft() {
   window.location.href = "draftconfig.html";
@@ -7,12 +13,6 @@ function irParaDraft() {
 function modoEmDesenvolvimento() {
   alert("Este modo de jogo ainda está em desenvolvimento.");
 }
-
-//variáveis para filtro de geração
-let filtroGeracao = {
-  gen4: true,
-  gen5: true
-};
 
 //f:sortearIntegrantes
 function sortearIntegrantes() {
@@ -88,7 +88,7 @@ function renderizarGrupos() {
       if (idol.gen === "5" && filtroGeracao.gen5) return true;
       return false;
     });
-    // Se não há idols filtrados para este grupo, pular
+    //se não há idols filtrados para este grupo, pular
     if (idolsFiltrados.length === 0) continue;
     let divGrupo = document.createElement("div");
     let checkboxGrupo = document.createElement("input");
@@ -179,6 +179,18 @@ function renderizarMusicas() {
   });
 }
 
+//f:pegarMusicasSelecionadas
+function pegarMusicasSelecionadas() {
+  let selecionados = [];
+  document.querySelectorAll("#musicContainer input[type='checkbox']").forEach(cb => {
+    if (cb.checked && cb.value) {
+      let music = musics.find(m => m.name === cb.value);
+      if (music) selecionados.push(music);
+    }
+  });
+  return selecionados;
+}
+
 //f:pegarIdolsSelecionados
 function pegarIdolsSelecionados() {
   let selecionados = [];
@@ -204,18 +216,6 @@ function pegarProdutoresSelecionados() {
   return selecionados;
 }
 
-//f:pegarMusicasSelecionadas
-function pegarMusicasSelecionadas() {
-  let selecionados = [];
-  document.querySelectorAll("#musicContainer input[type='checkbox']").forEach(cb => {
-    if (cb.checked && cb.value) {
-      let music = musics.find(m => m.name === cb.value);
-      if (music) selecionados.push(music);
-    }
-  });
-  return selecionados;
-}
-
 //f:sortearIdols
 function sortearIdols(lista, quantidade) {
   let copia = [...lista];
@@ -228,7 +228,7 @@ function sortearIdols(lista, quantidade) {
   return resultado;
 }
 
-//f:pegarMusicasSelecionadas
+//f:pegarProdutoresSelecionados
 function pegarProdutoresSelecionados() {
   let selecionados = [];
   const checkboxes = document.querySelectorAll("#producerContainer input[type='checkbox']");
@@ -269,23 +269,23 @@ function iniciarDraft() {
   let usarMusica = musicasSelecionadas.length > 0;
   let usarProdutor = produtoresSelecionados.length > 0;
   let pool = [];
-  //IDOLS
+  //idols
   let selecionados = pegarIdolsSelecionados();
   let totalIdols = jogadores.length * integrantes;
   pool = pool.concat(sortearIdols(selecionados, totalIdols));
-  //MUSIC
+  //music
   if (usarMusica) { 
     let musicas = sortearIdols(musicasSelecionadas, jogadores.length);
     musicas.forEach(m => m.type = "music");
     pool = pool.concat(musicas);
   }
-  //PRODUCER
+  //producer
   if (usarProdutor) {
     let produtores = sortearIdols(produtoresSelecionados, jogadores.length);
     produtores.forEach(p => p.type = "producer");
     pool = pool.concat(produtores);
   }
-  //GARANTIR IDOL TYPE
+  //garantir idol type
   pool = pool.map(item => ({
     ...item,
     type: item.type || "idol"
@@ -300,18 +300,6 @@ function iniciarDraft() {
   window.location.href = "draftgame.html";
 }
 
-//f:rankParaNumero
-function rankParaNumero(rank) {
-  return {
-    S: 6,
-    A: 5,
-    B: 4,
-    C: 3,
-    D: 2,
-    F: 1
-  }[rank] || 0;
-}
-
 //f:aplicarFiltroGeracao
 function aplicarFiltroGeracao() {
   const gen4Checked = document.getElementById("gen4Filter")?.checked || false;
@@ -320,7 +308,6 @@ function aplicarFiltroGeracao() {
   filtroGeracao.gen4 = gen4Checked;
   filtroGeracao.gen5 = gen5Checked;
   
-  // Re-renderizar os grupos com o novo filtro
   renderizarGrupos();
 }
 
@@ -330,7 +317,6 @@ function marcarTodosGeracoes() {
   checkboxes.forEach(cb => {
     cb.checked = true;
   });
-  // Atualizar checkboxes de grupo
   atualizarCheckboxesGrupo();
 }
 
@@ -340,7 +326,6 @@ function desmarcarTodosGeracoes() {
   checkboxes.forEach(cb => {
     cb.checked = false;
   });
-  // Atualizar checkboxes de grupo
   atualizarCheckboxesGrupo();
 }
 
@@ -374,3 +359,15 @@ window.onload = function () {
   renderizarProdutores();
   renderizarMusicas();
 };
+
+//f:rankParaNumero
+function rankParaNumero(rank) {
+  return {
+    S: 6,
+    A: 5,
+    B: 4,
+    C: 3,
+    D: 2,
+    F: 1
+  }[rank] || 0;
+}
