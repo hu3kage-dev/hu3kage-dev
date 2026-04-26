@@ -1,0 +1,606 @@
+/* =========================
+   BASE (INDEX + DRAFT)
+========================= */
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #111;
+  color: #eee;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: #a855f7; /* Roxo */
+}
+
+.game-modes {
+  display: flex;
+  justify-content: space-around;
+  width: 75%;
+  margin: 0 auto;
+  gap: 5%;
+}
+
+.mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.mode-image {
+  width: 100%;
+  height: auto;
+  border: 2px solid #3b82f6; /* Azul */
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.draft-btn {
+  background-color: #22c55e; /* Verde */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.draft-btn:hover {
+  background-color: #16a34a;
+}
+
+.disabled-btn {
+  background-color: #6b7280; /* Cinza */
+  color: #d1d5db;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: not-allowed;
+}
+
+h2, h3 {
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  border: none;
+  background-color: #444;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button:hover {
+  background-color: #666;
+}
+
+input {
+  padding: 5px;
+  margin: 5px;
+}
+
+/* =========================
+   DRAFT CONFIG GRID
+========================= */
+
+.config-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto calc((100vh - 100px) * 1.5);
+  height: auto;
+  gap: 10px;
+}
+
+.config-block {
+  background: #222;
+  padding: 15px;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* bloco 1: instruções */
+.config-block.block-1 {
+  background: #222;
+  padding: 15px;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+/* bloco 2 menu */
+.config-block.block-2 {
+  overflow: hidden;
+}
+
+/* corpo do bloco 2: dois lados lado a lado */
+.b2-body {
+  display: flex;
+  flex: 1;
+  gap: 15px;
+  overflow: hidden;
+  text-align: left;
+}
+
+/* coluna esquerda: labels + inputs + random */
+.b2-left {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+  gap: 10px;
+  width: 60%;
+}
+
+.b2-left .btn-iniciar-draft {
+  margin-top: auto;  /* empurra para o fundo */
+  width: 97%;
+}
+
+.players-label {
+  color: #ccc;
+  margin-top: 20px;
+  margin-bottom: 2px;
+}
+
+/* linha com label + input numérico */
+.b2-field {
+  display: grid;
+  grid-template-columns: auto 140px;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.b2-field label {
+  text-align: left;
+}
+
+.b2-field input[type="number"] {
+  width: 140px;
+  padding: 5px;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* coluna direita: scroll de nomes + botão draft */
+.b2-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.players-scroll-box {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #444;
+  padding: 8px;
+  background: #1a1a1a;
+  min-height: 0;
+}
+
+.btn-iniciar-draft {
+  background-color: #7e22ce;
+  border: 2px solid yellow;
+  color: white;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.btn-iniciar-draft:hover {
+  background-color: #6b21a8;
+}
+
+.config-block h3 {
+  text-align: center;
+  margin-top: 0;
+  color: #a855f7; /* Roxo */
+}
+
+.scroll-box {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #444;
+  padding: 10px;
+  background: #1a1a1a;
+}
+
+.half-container {
+  display: flex;
+  height: 100%;
+  gap: 10px;
+}
+
+.half-container > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.half-container .scroll-box {
+  flex: 1;
+}
+
+/* =========================
+   DRAFT (GRUPOS)
+========================= */
+
+#groupsContainer {
+  text-align: left;
+}
+
+#groupsContainer > div {
+  background: #333;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+#groupsContainer div div {
+  margin-left: 15px;
+}
+
+#producerContainer,
+#musicContainer {
+  margin-top: 10px;
+}
+
+/* =========================
+   GAME - PLAYER ROW
+========================= */
+
+.playerRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 10px;
+  border-bottom: 1px solid #444;
+  width: 100%;
+}
+
+.playerOrder {
+  width: 40px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.playerName {
+  width: 120px;
+  flex-shrink: 0;
+}
+
+/* container geral dos blocos */
+.playerBlocks {
+  display: flex;
+  flex: 1;
+  gap: 15px;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  width: 100%;
+  min-width: 0;
+}
+
+/* destaque jogador atual */
+.activePlayer {
+  background: rgba(255, 255, 0, 0.1);
+}
+
+/* =========================
+   BLOCOS
+========================= */
+
+.block {
+  display: flex;
+  flex-direction: column; /* título em cima */
+  align-items: stretch;
+  border: 2px solid;
+  padding: 8px;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.idolBlock {
+  flex: 1 1 0;
+  min-width: 0;
+  align-items: center;
+}
+
+.musicBlock,
+.producerBlock {
+  flex: 0 0 auto;
+  min-width: 0;
+  width: auto;
+}
+
+/* container dos slots (horizontal) */
+.block .slot {
+  flex: 0 0 90px;
+  width: 90px;
+  height: 120px;
+  border: 2px dashed #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.musicBlock .slot,
+.producerBlock .slot {
+  flex: 0 0 90px;
+  width: 90px;
+  height: 120px;
+  border: 2px dashed #555;
+}
+
+.idolBlock .slotsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  width: min(100%, calc(12 * 90px + 11 * 4px));
+  margin: 0 auto;
+}
+
+.musicBlock .slotsContainer,
+.producerBlock .slotsContainer {
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 4px;
+}
+
+/* faz os slots ficarem lado a lado */
+.block {
+  flex-wrap: wrap;
+}
+
+.slotsContainer {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  overflow: visible;
+}
+
+/* CORES */
+.idolBlock {
+  border-color: yellow;
+}
+
+.musicBlock {
+  border-color: navy;
+}
+
+.producerBlock {
+  border-color: purple;
+}
+
+.blockTitle {
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-align: center;
+  width: 100%;
+}
+
+/* =========================
+   SLOTS
+========================= */
+
+.locked {
+  opacity: 0.6;
+  border: 2px solid red;
+}
+
+/* cores por tipo */
+.idolBlock .slot {
+  border-color: yellow;
+}
+
+.musicBlock .slot {
+  border-color: navy;
+}
+
+.producerBlock .slot {
+  border-color: purple;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card {
+  width: 100%;
+  height: 100%;
+  background: #222;
+  border: 1px solid #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-size: 10px;
+  text-align: center;
+  cursor: grab;
+  user-select: none;
+}
+
+.playerBlocks .card {
+  width: 90px;
+  height: 120px;
+  border: none; /* Remove border para mostrar a borda do slot */
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+/* estado bloqueado */
+.card.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* =========================
+   POOL
+========================= */
+
+#pool {
+  margin-top: 20px;
+  padding: 10px;
+  border-top: 2px solid #444;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+#pool .card {
+  width: 160px;
+  height: 200px;
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media (max-width: 900px) {
+  .playerRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .playerBlocks {
+    flex-wrap: wrap;
+  }
+}
+/* CARD COM IMAGEM */
+.card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #444;
+  background: #000;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+
+/* nome por cima */
+.cardLabel {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: rgba(0,0,0,0.7);
+  font-size: 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+.cardInfo {
+  font-size: 8px;
+  color: #aaa;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardName {
+  font-size: 10px;
+  font-weight: bold;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Color Code para tipos de cards */
+.card-idol {
+  border: 3px solid yellow;
+  box-shadow: inset 0 0 8px rgba(255, 255, 0, 0.3);
+}
+
+.card-music {
+  border: 3px solid navy;
+  box-shadow: inset 0 0 8px rgba(0, 0, 128, 0.3);
+}
+
+.card-producer {
+  border: 3px solid purple;
+  box-shadow: inset 0 0 8px rgba(128, 0, 128, 0.3);
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  justify-content: center;
+  align-items: center;
+}
+
+.modalContent {
+  background: #222;
+  padding: 20px;
+  max-width: 390px;
+  max-height: 90vh;
+  min-width: 390px;
+}
+
+.modalImg {
+  width: 340px;
+  height: 400px;
+  object-fit: cover;
+  object-position: top;
+}
+
+.closeBtn {
+  cursor: pointer;
+  float: right;
+  font-size: 18px;
+}
+
+/*mode-image*/
+.mode-image {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  object-position: top; /* garante corte central */
+  border: 2px solid #3b82f6;
+  border-radius: 10px;
+}
