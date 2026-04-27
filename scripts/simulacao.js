@@ -1,8 +1,8 @@
 // =============================
 // CONSTANTES VARIÁVEIS GLOBAIS
 // =============================
-const ROLE_OPTIONS_IDOL = ["—","Main Vocal","Sub-vocal","Main Dancer","Lead Dancer","Main Rapper","Lead Rapper","Visual","Center"];
-const ROLE_OPTIONS_EXTRA = ["—","Cute","Dark Fantasy", "Dreamcore", "Dreamy", "Emotional","Girl Crush","Performance","Teen Crush"];
+const ROLE_OPTIONS_IDOL = ["Posição","Main Vocal","Sub-vocal","Main Dancer","Lead Dancer","Main Rapper","Lead Rapper","Visual","Center"];
+const ROLE_OPTIONS_EXTRA = ["Conceito","Cute","Dark Fantasy", "Dreamcore", "Dreamy", "Emotional","Girl Crush","Performance","Teen Crush"];
 const NUMBERED_ROLES = ["Sub-vocal","Lead Dancer","Lead Rapper"];
 let simData       = null;
 let boardSlots    = {};
