@@ -59,8 +59,10 @@ input {
 
 /* Imagens */
 .mode-image {
-  width: 100%;
-  height: auto;
+  width: 304px;
+  height: 304px;
+  object-fit: cover;
+  display: block;
   border: 2px solid purple;
   border-radius: 10px;
   margin-bottom: 10px;
