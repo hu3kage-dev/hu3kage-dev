@@ -87,6 +87,10 @@ function criarGhostCard(card) {
 //f:iniciarDrag
 function iniciarDrag(e, item, origem, playerIndex = null, slotIndex = null) {
   e.preventDefault();
+  // Verifica se o jogador está travado - impede drag
+  if (playerIndex !== null && lockedPlayers[playerIndex]) {
+    return;
+  }
   draggedItem = item;
   draggedElement = e.currentTarget;
   dragOrigin = origem;
