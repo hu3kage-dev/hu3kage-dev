@@ -1,4 +1,6 @@
-//variáveis globais
+// ===================
+// VARIÁVEIS GLOBAIS
+// ===================
 let jogadores = [];
 let ordem = [];
 let turno = 0;
@@ -8,14 +10,20 @@ let jogouNoTurno = false;
 let escolhaDoTurno = null;
 let avisoTurno = null;
 
-//variáveis para drag customizado
+// =====================
+// VARIÁVEIS DE DRAG  
+// =====================
 let draggedItem = null;
 let draggedElement = null;
 let dragOrigin = null;
 let dragPayload = null;
 let ghostCard = null;
 
-//inicialização
+// =====================
+// INICIALIZAÇÃO
+// =====================
+
+//f:onWindowLoad
 window.onload = function () {
   inicializarAviso();
   const dados = JSON.parse(localStorage.getItem("draftData"));
@@ -67,6 +75,10 @@ function inicializarAviso() {
     gameScreen.insertBefore(avisoTurno, gameScreen.firstChild);
   }
 }
+
+// =====================
+// DRAG QUEEN
+// =====================
 
 //f:criarGhostCard
 function criarGhostCard(card) {
@@ -140,15 +152,57 @@ function finalizarDrag(e) {
   dragPayload = null;
 }
 
+// =====================
+// BTS - MIC DROP
+// =====================
+
+//f:criarDropZone
+function criarDropZone(playerIndex, tipo) {
+  let bloco = document.createElement("div");
+  bloco.className = "board " + tipo + "Board";
+  let titulo = document.createElement("div");
+  titulo.className = "boardTitle";
+  titulo.innerText =
+    tipo === "idol" ? "Idols" :
+    tipo === "music" ? "Música" :
+    "Produtor";
+  let slotsContainer = document.createElement("div");
+  slotsContainer.className = "slotsContainer";
+  bloco.appendChild(titulo);
+  bloco.appendChild(slotsContainer);
+  //estrutura correta por tipo
+  if (!picks[playerIndex]) {
+    picks[playerIndex] = {
+      idol: Array(config.integrantes).fill(null),
+      music: [null],
+      producer: [null]
+    };
+  }
+  let lista = picks[playerIndex][tipo];
+  let totalSlots = lista.length;
+  for (let i = 0; i < totalSlots; i++) {
+    let slot = document.createElement("div");
+    slot.className = "slot";
+    let item = lista[i];
+    //render card
+    if (item) {
+      let card = criarCard(item, "board", playerIndex, i);
+      slot.appendChild(card);
+    }
+    slotsContainer.appendChild(slot);
+  }
+  return bloco;
+}
+
 //f:executarDropNoSlot
 function executarDropNoSlot(slot, data) {
   let playerIndex = null;
   let tipo = null;
-  let block = slot.closest(".block");
+  let block = slot.closest(".board");
   if (!block) return;
-  if (block.classList.contains("idolBlock")) tipo = "idol";
-  else if (block.classList.contains("musicBlock")) tipo = "music";
-  else if (block.classList.contains("producerBlock")) tipo = "producer";
+  if (block.classList.contains("idolBoard")) tipo = "idol";
+  else if (block.classList.contains("musicBoard")) tipo = "music";
+  else if (block.classList.contains("producerBoard")) tipo = "producer";
   else return;
   let playerRow = block.closest(".playerRow");
   if (!playerRow) return;
@@ -247,42 +301,9 @@ function mostrarAviso(texto) {
   avisoTurno.innerText = texto;
 }
 
-//f:desfazerEscolhaDoTurno
-function desfazerEscolhaDoTurno(playerIndex) {
-  if (!escolhaDoTurno || !picks[playerIndex]) return null;
-  let tipos = ["idol", "music", "producer"];
-  for (let tipo of tipos) {
-    let lista = picks[playerIndex][tipo];
-    if (!lista) continue;
-    for (let i = 0; i < lista.length; i++) {
-      if (
-        lista[i] &&
-        lista[i].id === escolhaDoTurno.id &&
-        !lista[i].locked
-      ) {
-        let item = lista[i];
-        lista[i] = null;
-        pool.push(item);
-        escolhaDoTurno = null;
-        jogouNoTurno = false;
-        mostrarAviso("");
-        return { item, type: tipo, slotIndex: i };
-      }
-    }
-  }
-  return null;
-}
-
-//f:restaurarEscolhaDoTurno
-function restaurarEscolhaDoTurno(removido, playerIndex) {
-  if (!removido || !picks[playerIndex]) return;
-  let listaAtual = picks[playerIndex][removido.type];
-  if (!listaAtual) return;
-  listaAtual[removido.slotIndex] = removido.item;
-  escolhaDoTurno = removido.item;
-  jogouNoTurno = true;
-  pool = pool.filter(p => p.id !== removido.item.id);
-}
+// =====================
+// TURNO
+// =====================
 
 //f:gerarOrdemCobrinha
 function gerarOrdemCobrinha(qtdJogadores, rodadas) {
@@ -313,223 +334,6 @@ function gerarOrdemCobrinha(qtdJogadores, rodadas) {
 //f:jogadorAtual
 function jogadorAtual() {
   return ordem[turno];
-}
-
-//f:render
-function render() {
-  renderPlayers();
-  renderPool();
-  atualizarTurnoUI();
-}
-
-//f:atualizarTurnoUI
-function atualizarTurnoUI() {
-  if (turno >= ordem.length) {
-    document.getElementById("turnoAtual").innerText = "Draft encerrado!";
-    return;
-  }
-  let index = jogadorAtual();
-  document.getElementById("turnoAtual").innerText =
-    "Turno de: " + jogadores[index];
-}
-
-//f:renderPlayers
-function renderPlayers() {
-  const board = document.getElementById("playersBoard");
-  if (!board) return;
-  board.innerHTML = "";
-  if (!jogadores || jogadores.length === 0) return;
-  const ordemBase = ordem.slice(0, jogadores.length);
-  ordemBase.forEach((playerIndex, posicao) => {
-    let nome = jogadores[playerIndex];
-    let row = document.createElement("div");
-    row.className = "playerRow";
-    let ordemDiv = document.createElement("div");
-    ordemDiv.className = "playerOrder";
-    ordemDiv.innerText = `${posicao + 1}º`;
-    let nomeDiv = document.createElement("div");
-    nomeDiv.className = "playerName";
-    nomeDiv.innerText = nome;
-    let blocos = document.createElement("div");
-    blocos.className = "playerBlocks";
-    //idols (sempre)
-    blocos.appendChild(criarDropZone(playerIndex, "idol"));
-    //music (condicional)
-    if (config.usarMusica) {
-    blocos.appendChild(criarDropZone(playerIndex, "music"));
-    }
-    //producer (condicional)
-    if (config.usarProdutor) {
-    blocos.appendChild(criarDropZone(playerIndex, "producer"));
-    }
-    row.appendChild(ordemDiv);
-    row.appendChild(nomeDiv);
-    row.appendChild(blocos);
-    if (playerIndex === jogadorAtual()) {
-      row.classList.add("activePlayer");
-    } else {
-      row.style.opacity = "0.4";
-    }
-    board.appendChild(row);
-  });
-}
-
-//f:renderPool
-function renderPool() {
-  const poolDiv = document.getElementById("pool");
-  if (!poolDiv) return;
-  poolDiv.innerHTML = "";
-  pool.forEach(item => {
-    let card = criarCard(item, "pool");
-    poolDiv.appendChild(card);
-  });
-}
-
-//****IMPORTANTÍSSIMA****
-//f:getCardImageCandidates
-function getCardImageCandidates(item) {
-  const sanitize = (text) => text
-    .toString()
-    .trim()
-    .normalize("NFD") // remove acentos
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "") // remove caracteres especiais e espaços
-    .replace(/^-+|-+$/g, ""); // remove hífen nas pontas
-    const itemType = getItemType(item);
-    const candidates = [];
-    const idSlug = sanitize(item.id);
-    const nameSlug = item.name;
-    
-    if (itemType === "idol") {
-      const groupSlug = item.group;
-      const query = encodeURIComponent(`${groupSlug} ${nameSlug}`);
-      candidates.push(`./assets/images/idol_${idSlug}.jpg`);
-      candidates.push(`./assets/images/idol_${idSlug}.png`);
-      candidates.push(`./assets/images/idol_${idSlug}.jpeg`);
-      candidates.push(`https://dummyimage.com/160x200/ffff00/000000&text=${query}`);
-      candidates.push(`https://via.placeholder.com/160x200/ffff00/000000?text=${query}`);
-      return candidates;
-    }
-
-  if (itemType === "music") {
-    const fonteSlug = sanitize(item.fonte || "");
-    const query = encodeURIComponent(`${fonteSlug} ${nameSlug}`);
-    if (fonteSlug) {
-      candidates.push(`./assets/images/music_${idSlug}.jpg`);
-      candidates.push(`./assets/images/music_${idSlug}.png`);
-      candidates.push(`./assets/images/music_${idSlug}.jpeg`);
-    }
-    candidates.push(`https://dummyimage.com/160x200/0000ff/ffffff&text=${query}`);
-    candidates.push(`https://via.placeholder.com/160x200/0000ff/ffffff?text=${query}`);
-    return candidates;
-  }
-
-  if (itemType === "producer") {
-    const query = encodeURIComponent(`${itemType} ${nameSlug}`);
-    candidates.push(`./assets/images/producer_${idSlug}.jpg`);
-    candidates.push(`./assets/images/producer_${idSlug}.png`);
-    candidates.push(`./assets/images/producer_${idSlug}.jpeg`);
-    candidates.push(`https://dummyimage.com/160x200/800080/ffffff&text=${query}`);
-    candidates.push(`https://via.placeholder.com/160x200/800080/ffffff?text=${query}`);
-    return candidates;
-  }
-
-  candidates.push(`./assets/images/${itemType}_${idSlug}.jpg`);
-  candidates.push(`./assets/images/${itemType}_${idSlug}.png`);
-  candidates.push(`./assets/images/${itemType}_${idSlug}.jpeg`);
-
-  return candidates;
-}
-
-//f:getCardImageSrc
-function getCardImageSrc(item) {
-  return getCardImageCandidates(item)[0];
-}
-
-//f:criarCard
-function criarCard(item, origem = "pool", playerIndex = null, slotIndex = null) {
-  let card = document.createElement("div");
-  card.className = "card";
-  //função para limpar aspas extras dos dados
-  const cleanText = (text) => {
-    if (!text) return "";
-    return text.replace(/\"{3}/g, '"').replace(/^["']|["']$/g, "").trim();
-  };
-  const itemType = getItemType(item);
-  //type colour coded lyrics
-  if (itemType === "idol") {
-    card.classList.add("card-idol");
-  } else if (itemType === "music") {
-    card.classList.add("card-music");
-  } else if (itemType === "producer") {
-    card.classList.add("card-producer");
-  }
-  if (item.locked) {
-    card.classList.add("locked");
-  }
-  const imageCandidates = getCardImageCandidates(item);
-  let candidateIndex = 0;
-  let img = document.createElement("img");
-  img.src = imageCandidates[candidateIndex];
-  img.onerror = () => {
-    candidateIndex += 1;
-    if (candidateIndex < imageCandidates.length) {
-      img.src = imageCandidates[candidateIndex];
-      return;
-    }
-    const fallbackType = getItemType(item);
-    const fallbackName = item.name
-      .toString()
-      .replace(/\s+/g, "_")
-      .replace(/[^a-zA-Z0-9_\-]/g, "");
-    img.onerror = null;
-    if (fallbackType === "idol") {
-      const fallbackGroup = item.group
-        .toString()
-        .replace(/\s+/g, "_")
-        .replace(/[^a-zA-Z0-9_\-]/g, "");
-      img.src = `./assets/images/idol_${fallbackGroup}_${fallbackName}.jpg`;
-    } else {
-      img.src = `./assets/images/${fallbackType}_${fallbackName}.jpg`;
-    }
-  };
-  let label = document.createElement("div");
-  label.className = "cardLabel";
-  //estruturar informações baseado no tipo
-  if (itemType === "idol") {
-    label.innerHTML = `<div class="cardInfo">${cleanText(item.group)}</div><div class="cardName">${item.name}</div>`;
-  } else if (itemType === "music") {
-    label.innerHTML = `<div class="cardInfo">${cleanText(item.fonte)}</div><div class="cardName">${item.name}</div>`;
-  } else if (itemType === "producer") {
-    label.innerHTML = `<div class="cardInfo">${itemType}</div><div class="cardName">${item.name}</div>`;
-  } else {
-    label.innerText = item.name;
-  }
-  card.appendChild(img);
-  card.appendChild(label);
-  //drag customizado (apenas se não estiver locked)
-  if (!item.locked) {
-    card.style.cursor = "grab";
-    card.addEventListener("mousedown", (e) => {
-      if (e.button === 0) {
-        iniciarDrag(e, item, origem, playerIndex, slotIndex);
-      }
-    });
-    card.addEventListener("mouseenter", () => {
-      if (!draggedElement) {
-        card.style.cursor = "grab";
-      }
-    });
-  }
-  //modal
-  card.addEventListener("click", (e) => {
-    //evita abrir modal se estiver fazendo drag
-    if (!draggedElement) {
-      abrirModal(item);
-    }
-  });
-  return card;
 }
 
 //f:adicionarItem
@@ -626,48 +430,338 @@ let lista = [
   return true;
 }
 
-//f:criarDropZone
-function criarDropZone(playerIndex, tipo) {
-  let bloco = document.createElement("div");
-  bloco.className = "block " + tipo + "Block";
-  let titulo = document.createElement("div");
-  titulo.className = "blockTitle";
-  titulo.innerText =
-    tipo === "idol" ? "Idols" :
-    tipo === "music" ? "Música" :
-    "Produtor";
-  let slotsContainer = document.createElement("div");
-  slotsContainer.className = "slotsContainer";
-  bloco.appendChild(titulo);
-  bloco.appendChild(slotsContainer);
-  //estrutura correta por tipo
-  if (!picks[playerIndex]) {
-    picks[playerIndex] = {
-      idol: Array(config.integrantes).fill(null),
-      music: [null],
-      producer: [null]
-    };
+//f:atualizarTurnoUI
+function atualizarTurnoUI() {
+  if (turno >= ordem.length) {
+    document.getElementById("turnoAtual").innerText = "Draft encerrado!";
+    return;
   }
-  let lista = picks[playerIndex][tipo];
-  let totalSlots = lista.length;
-  for (let i = 0; i < totalSlots; i++) {
-    let slot = document.createElement("div");
-    slot.className = "slot";
-    let item = lista[i];
-    //render card
-    if (item) {
-      let card = criarCard(item, "board", playerIndex, i);
-      slot.appendChild(card);
-    }
-    slotsContainer.appendChild(slot);
-  }
-  return bloco;
+  let index = jogadorAtual();
+  document.getElementById("turnoAtual").innerText =
+    "Turno de: " + jogadores[index];
 }
 
-//f:verificarFimDoJogo
-function verificarFimDoJogo() {
-  return todosBoardsCompletos();
+//f:desfazerEscolhaDoTurno
+function desfazerEscolhaDoTurno(playerIndex) {
+  if (!escolhaDoTurno || !picks[playerIndex]) return null;
+  let tipos = ["idol", "music", "producer"];
+  for (let tipo of tipos) {
+    let lista = picks[playerIndex][tipo];
+    if (!lista) continue;
+    for (let i = 0; i < lista.length; i++) {
+      if (
+        lista[i] &&
+        lista[i].id === escolhaDoTurno.id &&
+        !lista[i].locked
+      ) {
+        let item = lista[i];
+        lista[i] = null;
+        pool.push(item);
+        escolhaDoTurno = null;
+        jogouNoTurno = false;
+        mostrarAviso("");
+        return { item, type: tipo, slotIndex: i };
+      }
+    }
+  }
+  return null;
 }
+
+//f:restaurarEscolhaDoTurno
+function restaurarEscolhaDoTurno(removido, playerIndex) {
+  if (!removido || !picks[playerIndex]) return;
+  let listaAtual = picks[playerIndex][removido.type];
+  if (!listaAtual) return;
+  listaAtual[removido.slotIndex] = removido.item;
+  escolhaDoTurno = removido.item;
+  jogouNoTurno = true;
+  pool = pool.filter(p => p.id !== removido.item.id);
+}
+
+// =====================
+// RENDER
+// =====================
+
+//f:render
+function render() {
+  renderPlayers();
+  renderPool();
+  atualizarTurnoUI();
+}
+
+//f:renderPlayers
+function renderPlayers() {
+  const board = document.getElementById("playersBoard");
+  if (!board) return;
+  board.innerHTML = "";
+  if (!jogadores || jogadores.length === 0) return;
+  const ordemBase = ordem.slice(0, jogadores.length);
+  ordemBase.forEach((playerIndex, posicao) => {
+    let nome = jogadores[playerIndex];
+    let row = document.createElement("div");
+    row.className = "playerRow";
+    let meta = document.createElement("div");
+    meta.className = "playerMeta";
+    let ordemDiv = document.createElement("span");
+    ordemDiv.className = "playerOrder";
+    ordemDiv.innerText = `${posicao + 1}º`;
+    let nomeDiv = document.createElement("span");
+    nomeDiv.className = "playerName";
+    nomeDiv.innerText = nome;
+    meta.appendChild(ordemDiv);
+    meta.appendChild(nomeDiv);
+    row.appendChild(meta);
+    let blocos = document.createElement("div");
+    blocos.className = "playerBlocks";
+    //idols (sempre)
+    blocos.appendChild(criarDropZone(playerIndex, "idol"));
+    //music (condicional)
+    if (config.usarMusica) {
+    blocos.appendChild(criarDropZone(playerIndex, "music"));
+    }
+    //producer (condicional)
+    if (config.usarProdutor) {
+    blocos.appendChild(criarDropZone(playerIndex, "producer"));
+    }
+    row.appendChild(blocos);
+    if (playerIndex === jogadorAtual()) {
+      row.classList.add("activePlayer");
+    } else {
+      row.style.opacity = "0.4";
+    }
+    board.appendChild(row);
+  });
+}
+
+//f:renderPool
+function renderPool() {
+  const poolDiv = document.getElementById("pool");
+  if (!poolDiv) return;
+  poolDiv.innerHTML = "";
+  pool.forEach(item => {
+    let card = criarCard(item, "pool");
+    poolDiv.appendChild(card);
+  });
+}
+
+// =====================
+// IMAGENS
+// =====================
+
+//f:getCardImageCandidates
+function getCardImageCandidates(item) {
+  const sanitize = (text) => text
+    .toString()
+    .trim()
+    .normalize("NFD") // remove acentos
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "") // remove caracteres especiais e espaços
+    .replace(/^-+|-+$/g, ""); // remove hífen nas pontas
+    const itemType = getItemType(item);
+    const candidates = [];
+    const idSlug = sanitize(item.id);
+    const nameSlug = item.name;
+    
+    if (itemType === "idol") {
+      const groupSlug = item.group;
+      const query = encodeURIComponent(`${groupSlug} ${nameSlug}`);
+      candidates.push(`./assets/images/idol_${idSlug}.jpg`);
+      candidates.push(`./assets/images/idol_${idSlug}.png`);
+      candidates.push(`./assets/images/idol_${idSlug}.jpeg`);
+      candidates.push(`https://dummyimage.com/160x200/ffff00/000000&text=${query}`);
+      candidates.push(`https://via.placeholder.com/160x200/ffff00/000000?text=${query}`);
+      return candidates;
+    }
+
+  if (itemType === "music") {
+    const fonteSlug = sanitize(item.fonte || "");
+    const query = encodeURIComponent(`${fonteSlug} ${nameSlug}`);
+    if (fonteSlug) {
+      candidates.push(`./assets/images/music_${idSlug}.jpg`);
+      candidates.push(`./assets/images/music_${idSlug}.png`);
+      candidates.push(`./assets/images/music_${idSlug}.jpeg`);
+    }
+    candidates.push(`https://dummyimage.com/160x200/0000ff/ffffff&text=${query}`);
+    candidates.push(`https://via.placeholder.com/160x200/0000ff/ffffff?text=${query}`);
+    return candidates;
+  }
+
+  if (itemType === "producer") {
+    const query = encodeURIComponent(`Producer ${nameSlug}`);
+    candidates.push(`./assets/images/producer_${idSlug}.jpg`);
+    candidates.push(`./assets/images/producer_${idSlug}.png`);
+    candidates.push(`./assets/images/producer_${idSlug}.jpeg`);
+    candidates.push(`https://dummyimage.com/160x200/800080/ffffff&text=${query}`);
+    candidates.push(`https://via.placeholder.com/160x200/800080/ffffff?text=${query}`);
+    return candidates;
+  }
+
+  candidates.push(`./assets/images/${itemType}_${idSlug}.jpg`);
+  candidates.push(`./assets/images/${itemType}_${idSlug}.png`);
+  candidates.push(`./assets/images/${itemType}_${idSlug}.jpeg`);
+
+  return candidates;
+}
+
+// =====================
+// CARD
+// =====================
+
+//f:getCardImageSrc
+function getCardImageSrc(item) {
+  return getCardImageCandidates(item)[0];
+}
+
+//f:criarCard
+function criarCard(item, origem = "pool", playerIndex = null, slotIndex = null) {
+  let card = document.createElement("div");
+  card.className = "card";
+  // Limpa aspas extras dos dados
+  const cleanText = (text) => {
+    if (!text) return "";
+    return text.replace(/\"{3}/g, '"').replace(/^["']|["']$/g, "").trim();
+  };
+  const itemType = getItemType(item);
+  // Type colour coded lyrics
+  if (itemType === "idol") {
+    card.classList.add("card-idol");
+  } else if (itemType === "music") {
+    card.classList.add("card-music");
+  } else if (itemType === "producer") {
+    card.classList.add("card-producer");
+  }
+  if (item.locked) {
+    card.classList.add("locked");
+  }
+  // Imagem com fallback chain
+  const imageCandidates = getCardImageCandidates(item);
+  let candidateIndex = 0;
+  let img = document.createElement("img");
+  img.src = imageCandidates[candidateIndex];
+  img.onerror = () => {
+    candidateIndex += 1;
+    if (candidateIndex < imageCandidates.length) {
+      img.src = imageCandidates[candidateIndex];
+      return;
+    }
+    const fallbackType = getItemType(item);
+    const fallbackName = item.name
+      .toString()
+      .replace(/\s+/g, "_")
+      .replace(/[^a-zA-Z0-9_\-]/g, "");
+    img.onerror = null;
+    if (fallbackType === "idol") {
+      const fallbackGroup = item.group
+        .toString()
+        .replace(/\s+/g, "_")
+        .replace(/[^a-zA-Z0-9_\-]/g, "");
+      img.src = `./assets/images/idol_${fallbackGroup}_${fallbackName}.jpg`;
+    } else {
+      img.src = `./assets/images/${fallbackType}_${fallbackName}.jpg`;
+    }
+  };
+  let label = document.createElement("div");
+  label.className = "cardLabel";
+  // Estruturar informações baseado no tipo
+  if (itemType === "idol") {
+    label.innerHTML = `<div class="cardInfo">${cleanText(item.group)}</div><div class="cardName">${item.name}</div>`;
+  } else if (itemType === "music") {
+    label.innerHTML = `<div class="cardInfo">${cleanText(item.fonte)}</div><div class="cardName">${item.name}</div>`;
+  } else if (itemType === "producer") {
+    label.innerHTML = `<div class="cardInfo">${itemType}</div><div class="cardName">${item.name}</div>`;
+  } else {
+    label.innerText = item.name;
+  }
+  card.appendChild(img);
+  card.appendChild(label);
+  // Drag
+  if (!item.locked) {
+    card.style.cursor = "grab";
+    card.addEventListener("mousedown", (e) => {
+      if (e.button === 0) {
+        iniciarDrag(e, item, origem, playerIndex, slotIndex);
+      }
+    });
+    card.addEventListener("mouseenter", () => {
+      if (!draggedElement) {
+        card.style.cursor = "grab";
+      }
+    });
+  }
+  // Modal
+  card.addEventListener("click", (e) => {
+    //evita abrir modal se estiver fazendo drag
+    if (!draggedElement) {
+      abrirModal(item);
+    }
+  });
+  return card;
+}
+
+// =====================
+// MODAL
+// =====================
+
+//f:abrirModal
+function abrirModal(item) {
+  let modal = document.getElementById("modal");
+  if (!modal) return;
+  modal.style.display = "flex";
+  const itemType = getItemType(item);
+  const cleanText = (text) => {
+    if (!text) return "-";
+    return text.toString().replace(/"{3}/g, '"').replace(/^['"]|['"]$/g, "").trim();
+  };
+  let bodyContent = "";
+  if (itemType === "idol") {
+    bodyContent = `
+    <p><b>Grupo:</b> ${cleanText(item.group)}</p>
+    <p><b>Vocal:</b> ${cleanText(item.vocal)}</p>
+    <p><b>Dance:</b> ${cleanText(item.dance)}</p>
+    <p><b>Rap:</b> ${cleanText(item.rap)}</p>
+    <p><b>Center:</b> ${cleanText(item.center)}</p>
+    <p><b>Visual:</b> ${cleanText(item.visual)}</p>
+    <p><b>Conceito Predominante:</b> ${cleanText(item.conceito)}</p>
+    <p><b>Pontos Fortes:</b> ${cleanText(item.fortes)}</p>
+    <p><b>Pontos Fracos:</b> ${cleanText(item.fracos)}</p>
+    `;
+  } else if (itemType === "music") {
+    bodyContent = `
+    <p><b>Fonte:</b> ${cleanText(item.fonte)}</p>
+    <p><b>Conceito Original:</b> ${cleanText(item.conceito)}</p>
+    `;
+  } else if (itemType === "producer") {
+    bodyContent = `
+    <p><b>Conceito Predominante:</b> ${cleanText(item.conceito)}</p>
+    <p><b>Outros Conceitos:</b> ${cleanText(item.outrosconceitos)}</p>
+    `;
+  } else {
+    bodyContent = `<p><b>Tipo:</b> ${itemType}</p>`;
+  }
+  modal.innerHTML = `
+  <div class="modalContent">
+  <span class="closeBtn" onclick="fecharModal()">X</span>
+  <img src="${getCardImageSrc(item)}" class="modalImg">
+  <h2>${cleanText(item.name)}</h2>
+  ${bodyContent}
+  </div>
+  `;
+  modal.onclick = (e) => {
+    if (e.target === modal) {
+      fecharModal();
+    }
+  };
+}
+
+//f:fecharModal
+function fecharModal() {
+  document.getElementById("modal").style.display = "none";
+}
+
+// =====================
+// ENCERRAR DRAFT
+// =====================
 
 //f:todosBoardsCompletos
 function todosBoardsCompletos() {
@@ -690,63 +784,27 @@ function todosBoardsCompletos() {
   return true;
 }
 
+//f:verificarFimDoJogo
+function verificarFimDoJogo() {
+  return todosBoardsCompletos();
+}
+
 //f:encerrarDraft
 function encerrarDraft() {
   mostrarAviso("🎉 Draft Encerrado! Todos os boards foram preenchidos com sucesso!");
-}
-
-//f:abrirModal
-function abrirModal(item) {
-  let modal = document.getElementById("modal");
-  if (!modal) return;
-  modal.style.display = "flex";
-  const itemType = getItemType(item);
-  const cleanText = (text) => {
-    if (!text) return "-";
-    return text.toString().replace(/"{3}/g, '"').replace(/^['"]|['"]$/g, "").trim();
-  };
-  let bodyContent = "";
-  if (itemType === "idol") {
-    bodyContent = `
-      <p><b>Grupo:</b> ${cleanText(item.group)}</p>
-      <p><b>Vocal:</b> ${cleanText(item.vocal)}</p>
-      <p><b>Dance:</b> ${cleanText(item.dance)}</p>
-      <p><b>Rap:</b> ${cleanText(item.rap)}</p>
-      <p><b>Center:</b> ${cleanText(item.center)}</p>
-      <p><b>Visual:</b> ${cleanText(item.visual)}</p>
-      <p><b>Conceito Predominante:</b> ${cleanText(item.conceito)}</p>
-      <p><b>Pontos Fortes:</b> ${cleanText(item.fortes)}</p>
-      <p><b>Pontos Fracos:</b> ${cleanText(item.fracos)}</p>
-    `;
-  } else if (itemType === "music") {
-    bodyContent = `
-      <p><b>Fonte:</b> ${cleanText(item.fonte)}</p>
-      <p><b>Conceito Original:</b> ${cleanText(item.conceito)}</p>
-    `;
-  } else if (itemType === "producer") {
-    bodyContent = `
-      <p><b>Conceito Predominante:</b> ${cleanText(item.conceito)}</p>
-      <p><b>Outros Conceitos:</b> ${cleanText(item.outrosconceitos)}</p>
-    `;
-  } else {
-    bodyContent = `<p><b>Tipo:</b> ${itemType}</p>`;
+  localStorage.setItem("simulacaoData", JSON.stringify({
+    jogadores,
+    ordem: ordem.slice(0, jogadores.length),
+    picks,
+    config: window.config
+  }));
+  const btn = document.querySelector("#gameScreen button");
+  if (btn) {
+    btn.innerText = "Fase de Simulação";
+    btn.style.backgroundColor = "#7e22ce";
+    btn.style.border = "2px solid yellow";
+    btn.onclick = () => { window.location.href = "simulacao.html"; };
   }
-  modal.innerHTML = `
-    <div class="modalContent">
-      <span class="closeBtn" onclick="fecharModal()">X</span>
-      <img src="${getCardImageSrc(item)}" class="modalImg">
-      <h2>${cleanText(item.name)}</h2>
-      ${bodyContent}
-    </div>
-  `;
-  modal.onclick = (e) => {
-    if (e.target === modal) {
-      fecharModal();
-    }
-  };
 }
 
-//f:fecharModal
-function fecharModal() {
-  document.getElementById("modal").style.display = "none";
-}
+//tá lendo isso por quê, curioso?

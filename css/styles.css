@@ -1,4 +1,6 @@
-/* index / draftconfig */
+/* ===============
+  estilos globais
+================ */
 body {
   font-family: Arial, sans-serif;
   background-color: #111;
@@ -8,53 +10,8 @@ body {
 }
 
 h1 {
-  margin-bottom: 20px;
+  margin-bottom: 60px;
   color: #a855f7;
-}
-
-.game-modes {
-  display: flex;
-  justify-content: space-around;
-  width: 75%;
-  margin: 0 auto;
-  gap: 5%;
-}
-
-.mode {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-}
-
-.mode-image {
-  width: 100%;
-  height: auto;
-  border: 2px solid #3b82f6;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-
-.draft-btn {
-  background-color: #22c55e;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.draft-btn:hover {
-  background-color: #16a34a;
-}
-
-.disabled-btn {
-  background-color: #6b7280;
-  color: #d1d5db;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: not-allowed;
 }
 
 h2, h3 {
@@ -80,7 +37,66 @@ input {
   margin: 5px;
 }
 
-/* draftconfig */
+/* ============
+  index.html
+============ */
+
+/* Título */
+.game-modes {
+  display: flex;
+  justify-content: space-around;
+  width: 75%;
+  margin: 0 auto;
+  gap: 5%;
+}
+
+.mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+/* Imagens */
+.mode-image {
+  width: 100%;
+  height: auto;
+  border: 2px solid purple;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+/* Botões */
+.draft-btn {
+  background-color: #22c55e;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.draft-btn:hover {
+  background-color: #16a34a;
+}
+
+.disabled-btn {
+  background-color: #6b7280;
+  color: #d1d5db;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: not-allowed;
+}
+
+/* ==================
+  draftconfig.html
+================== */
+
+/* Título */
+/* h1 e h3 definidos globalmente */
+
+/* Bloco 1 - Instruções */
 .config-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -98,18 +114,17 @@ input {
   flex-direction: column;
 }
 
-/* bloco 1: instruções */
 .config-block.block-1 {
-  background: #222;
-  padding: 15px;
-  border-radius: 8px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
   text-align: left;
 }
 
-/* bloco 2 menu */
+.config-block h3 {
+  text-align: center;
+  margin-top: 0;
+  color: #a855f7;
+}
+
+/* Bloco 2 - Opções de Configuração */
 .config-block.block-2 {
   overflow: hidden;
 }
@@ -132,17 +147,6 @@ input {
   width: 60%;
 }
 
-.b2-left .btn-iniciar-draft {
-  margin-top: auto;
-  width: 97%;
-}
-
-.players-label {
-  color: #ccc;
-  margin-top: 20px;
-  margin-bottom: 2px;
-}
-
 .b2-field {
   display: grid;
   grid-template-columns: auto 140px;
@@ -160,6 +164,13 @@ input {
   padding: 5px;
   margin: 0;
   box-sizing: border-box;
+}
+
+/* Inputs */
+.players-label {
+  color: #ccc;
+  margin-top: 20px;
+  margin-bottom: 2px;
 }
 
 .b2-right {
@@ -181,6 +192,7 @@ input {
   min-height: 0;
 }
 
+/* Botões */
 .btn-iniciar-draft {
   background-color: #7e22ce;
   border: 2px solid yellow;
@@ -196,13 +208,12 @@ input {
   background-color: #6b21a8;
 }
 
-.config-block h3 {
-  text-align: center;
-  margin-top: 0;
-  color: #a855f7;
+.b2-left .btn-iniciar-draft {
+  margin-top: auto;
+  width: 97%;
 }
 
-/* blocos 3 e 4 */
+/* Bloco 3 - Seleção de Idols */
 #groupsContainer {
   text-align: left;
 }
@@ -218,17 +229,18 @@ input {
   margin-left: 15px;
 }
 
-#producerContainer,
-#musicContainer {
-  margin-top: 10px;
-}
-
 .scroll-box {
   flex: 1;
   overflow-y: auto;
   border: 1px solid #444;
   padding: 10px;
   background: #1a1a1a;
+}
+
+/* Bloco 4 - Seleção de Músicas e Produtores */
+#producerContainer,
+#musicContainer {
+  margin-top: 10px;
 }
 
 .half-container {
@@ -247,30 +259,59 @@ input {
   flex: 1;
 }
 
+/* =====================
+  draftgame.html
+===================== */
 
-/* draftgame */
-/* player row */
+/* Título */
+#gameScreen h1 {
+  margin-bottom: 10px;
+}
+
+/* Botão de Turno */
+#gameScreen button {
+  margin-bottom: 15px;
+}
+
+/* Linha do Jogador */
 .playerRow {
   display: flex;
   align-items: flex-start;
   gap: 15px;
   padding: 10px;
-  border-bottom: 1px solid #444;
+  border-bottom: 2px solid #444;
   width: 100%;
 }
 
-.playerOrder {
-  width: 40px;
-  font-weight: bold;
+.playerMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  justify-content: left;
+  gap: 4px;
+  min-width: 130px;
   flex-shrink: 0;
+}
+
+.playerOrder {
+  font-weight: bold;
+  color: #a855f7;
+  font-size: 24px;
 }
 
 .playerName {
-  width: 120px;
-  flex-shrink: 0;
+  font-weight: bold;
+  font-size: 24px;
+  color: #fff;
+  text-align: center;
 }
 
-/* player blocks */
+/* Jogador Atual */
+.activePlayer {
+  background: rgba(174, 0, 255, 0.1);
+}
+
+/* Board */
 .playerBlocks {
   display: flex;
   flex: 1;
@@ -281,159 +322,97 @@ input {
   min-width: 0;
 }
 
-/* jogador atual */
-.activePlayer {
-  background: rgba(255, 255, 0, 0.1);
-}
-
-/* blocks (board) */
-.block {
+.board { 
   display: flex;
   flex-direction: column;
-  align-items: stretch;
   border: 2px solid;
+  border-radius: 6px;
+  flex: 1;
   padding: 8px;
-  flex: 1 1 0;
   min-width: 0;
-  max-width: 100%;
-  box-sizing: border-box;
+  background: #111;
 }
 
-.idolBlock {
-  flex: 1 1 0;
-  min-width: 0;
-  align-items: center;
+.boardTitle { 
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 6px;
+  letter-spacing: 1px;
 }
 
-.musicBlock,
-.producerBlock {
+.musicBoard,
+.producerBoard {
   flex: 0 0 auto;
   min-width: 0;
   width: auto;
 }
 
-/* container dos slots (horizontal) */
-.block .slot {
-  flex: 0 0 90px;
-  width: 90px;
-  height: 120px;
-  border: 2px dashed #555;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Boards colour coded lyrics */
+.idolBoard {
+  border-color: yellow;
 }
 
-.musicBlock .slot,
-.producerBlock .slot {
-  flex: 0 0 90px;
-  width: 90px;
-  height: 120px;
-  border: 2px dashed #555;
+.musicBoard {
+  border-color: navy;
 }
 
-.idolBlock .slotsContainer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 4px;
-  width: min(100%, calc(12 * 90px + 11 * 4px));
-  margin: 0 auto;
+.producerBoard {
+  border-color: purple;
 }
 
-.musicBlock .slotsContainer,
-.producerBlock .slotsContainer {
-  display: flex;
-  justify-content: center;
-  flex-wrap: nowrap;
-  gap: 4px;
-}
-
-.block {
-  flex-wrap: wrap;
-}
-
+/* Slots */
 .slotsContainer {
   display: flex;
-  justify-content: center;
   gap: 4px;
   width: 100%;
   overflow: visible;
 }
 
-/* blocks colour coded lyrics */
-.idolBlock {
+.idolBoard .slotsContainer {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin: 0 auto;
+}
+
+.musicBoard .slotsContainer,
+.producerBoard .slotsContainer {
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+
+.board .slot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 0 0 90px;
+  align-content: flex-start;
+  background: #0a0a0a;
+  width: 90px;
+  height: 120px;
+  border: 2px dashed #555;
+}
+
+/* Slots colour coded lyrics */
+.idolBoard .slot {
   border-color: yellow;
 }
 
-.musicBlock {
+.musicBoard .slot {
   border-color: navy;
 }
 
-.producerBlock {
+.producerBoard .slot {
   border-color: purple;
 }
 
-.blockTitle {
-  font-size: 12px;
-  font-weight: bold;
-  margin-bottom: 5px;
-  text-align: center;
-  width: 100%;
-}
-
-/* slots */
 .locked {
   opacity: 0.6;
   border: 2px solid red;
 }
 
-/* slots colour coded lyrics */
-.idolBlock .slot {
-  border-color: yellow;
-}
-
-.musicBlock .slot {
-  border-color: navy;
-}
-
-.producerBlock .slot {
-  border-color: purple;
-}
-
-/* draft cards */
-.card {
-  width: 100%;
-  height: 100%;
-  background: #222;
-  border: 1px solid #444;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  font-size: 10px;
-  text-align: center;
-  cursor: grab;
-  user-select: none;
-}
-
-.playerBlocks .card {
-  width: 90px;
-  height: 120px;
-  border: none;
-}
-
-.card:active {
-  cursor: grabbing;
-}
-
-/* bloqueado */
-.card.disabled {
-  opacity: 0.3;
-  pointer-events: none;
-}
-
 /* Pool */
-
 #pool {
   margin-top: 20px;
   padding: 10px;
@@ -449,17 +428,7 @@ input {
   height: 200px;
 }
 
-@media (max-width: 900px) {
-  .playerRow {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .playerBlocks {
-    flex-wrap: wrap;
-  }
-}
-/* imagens do card */
+/* Card */
 .card {
   width: 100%;
   height: 100%;
@@ -472,6 +441,11 @@ input {
   align-items: center;
   justify-content: center;
   text-align: center;
+  user-select: none;
+}
+
+.card:active {
+  cursor: grabbing;
 }
 
 .card img {
@@ -481,7 +455,6 @@ input {
   object-position: top;
 }
 
-/* card label */
 .cardLabel {
   position: absolute;
   bottom: 0;
@@ -513,7 +486,7 @@ input {
   white-space: nowrap;
 }
 
-/* draft cards colour coded lyrics */
+/* Card colour coded lyrics */
 .card-idol {
   border: 3px solid yellow;
   box-shadow: inset 0 0 8px rgba(255, 255, 0, 0.3);
@@ -529,7 +502,12 @@ input {
   box-shadow: inset 0 0 8px rgba(128, 0, 128, 0.3);
 }
 
-/* modal */
+.card.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Modal */
 .modal {
   display: none;
   position: fixed;
@@ -563,12 +541,14 @@ input {
   font-size: 18px;
 }
 
-/* image modal */
-.mode-image {
-  width: 300px;
-  height: 300px;
-  object-fit: cover;
-  object-position: top;
-  border: 2px solid #3b82f6;
-  border-radius: 10px;
+/* Media Queries */
+@media (max-width: 900px) {
+  .playerRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .playerBlocks {
+    flex-wrap: wrap;
+  }
 }

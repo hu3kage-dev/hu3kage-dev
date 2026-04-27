@@ -360,14 +360,4 @@ window.onload = function () {
   renderizarMusicas();
 };
 
-//f:rankParaNumero
-function rankParaNumero(rank) {
-  return {
-    S: 6,
-    A: 5,
-    B: 4,
-    C: 3,
-    D: 2,
-    F: 1
-  }[rank] || 0;
-}
+//tá lendo isso por quê, curioso?
