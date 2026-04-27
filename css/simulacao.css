@@ -40,7 +40,7 @@ h1 {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  min-width: 50px;
+  min-width: 130px;
   flex-shrink: 0;
 }
 
