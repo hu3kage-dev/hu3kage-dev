@@ -6,6 +6,31 @@
 // ========================
 const PATCHES = [
   {
+    version: "v0.4.1",
+    title: "Nova Identidade Visual e Validações",
+    date: "2025-04-28",
+    type: "minor",
+    sections: [
+      {
+        type: "new",
+        label: "Novo",
+        items: [
+          "A identidade visual do site foi reestruturada para um deisgn mais moderno.",
+        ]
+      },
+      {
+        type: "fix",
+        label: "Correções",
+        items: [
+          "Uma validação foi adicionada para impedir que o draft seja iniciado se as regras não forem atendidas, com mensagens de erro específicas para cada tipo de inconsistência (ex: número insuficiente de idols, músicas ou produtores selecionados).",
+          "Uma validação foi adicionada para impedir que o mesmo nome de jogador seja adicionado mais de uma vez, garantindo que cada jogador tenha um nome único no draft.",
+          "Ajustado o visual do botão de Travar Escolha para indicar claramente quando ele está habilitado ou desabilitado, melhorando a experiência do usuário durante a fase de simulação.",
+          "Um aviso é emitido se o jogador tentar clicar no botão de Travar Escolha sem que todos os slots estejam preenchidos ou sem que todos os roles estejam atribuídos.",
+        ]
+      }
+    ]
+  },
+  {
     version: "v0.4.0",
     title: "Fase de Simulação",
     date: "2025-04-27",

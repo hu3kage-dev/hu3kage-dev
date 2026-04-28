@@ -3,22 +3,22 @@
 // ========================
 
 // Detecta se está em uma página dentro de screens/ e ajusta pathings
+//f:getBaseHref
 function getBaseHref() {
   const path = location.pathname;
   return path.includes('/screens/') ? '../' : './';
 }
-
 const NAV_LINKS = [
   { label: "Início",        href: "index.html" },
   { label: "Draft",         href: "draftconfig.html" },
   { label: "Patch Notes",   href: "patchnotes.html" },
 ];
 
+//f:getNavLink
 function getNavLink(href) {
   const base = getBaseHref();
   const isScreensPage = location.pathname.includes('/screens/');
   const screenPages = ["draftconfig.html", "patchnotes.html"];
-  
   if (isScreensPage) {
     if (screenPages.includes(href)) {
       return href;
@@ -32,6 +32,7 @@ function getNavLink(href) {
 }
 
 // Função para obter path correto para páginas de jogo (simulacao.html e draftgame.html)
+//f:getGamePageHref
 function getGamePageHref(pageName) {
   const isScreensPage = location.pathname.includes('/screens/');
   if (isScreensPage) {
@@ -40,6 +41,7 @@ function getGamePageHref(pageName) {
   return `screens/${pageName}`; // Se está na raiz, precisa de screens/
 }
 
+//f:injectHeader
 function injectHeader() {
   const currentPage = location.pathname.split("/").pop() || "index.html";
   const isGamePage = ["draftgame.html", "simulacao.html"].includes(currentPage);
