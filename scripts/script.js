@@ -1,11 +1,42 @@
 // ========================
 // HEADER — injetado em todas as páginas que carregarem este script
 // ========================
+
+// Detecta se está em uma página dentro de screens/ e ajusta pathings
+function getBaseHref() {
+  const path = location.pathname;
+  return path.includes('/screens/') ? '../' : './';
+}
+
 const NAV_LINKS = [
   { label: "Início",        href: "index.html" },
   { label: "Draft",         href: "draftconfig.html" },
   { label: "Patch Notes",   href: "patchnotes.html" },
 ];
+
+function getNavLink(href) {
+  const base = getBaseHref();
+  const isScreensPage = location.pathname.includes('/screens/');
+  if (isScreensPage) {
+    if (href === "draftconfig.html") {
+      return href;
+    }
+    return `${base}${href}`;
+  }
+  if (href === "draftconfig.html") {
+    return `screens/${href}`;
+  }
+  return href;
+}
+
+// Função para obter path correto para páginas de jogo (simulacao.html e draftgame.html)
+function getGamePageHref(pageName) {
+  const isScreensPage = location.pathname.includes('/screens/');
+  if (isScreensPage) {
+    return pageName; // Se já está em screens/, usa direto
+  }
+  return `screens/${pageName}`; // Se está na raiz, precisa de screens/
+}
 
 function injectHeader() {
   const currentPage = location.pathname.split("/").pop() || "index.html";
@@ -13,6 +44,7 @@ function injectHeader() {
   const showNav = !isGamePage;
   const header = document.createElement("header");
   header.className = "site-header";
+  const homeHref = getNavLink("index.html");
   header.innerHTML = `
     ${isGamePage ? `
       <div class="header-logo disabled-logo">
@@ -22,7 +54,7 @@ function injectHeader() {
         </div>
       </div>
     ` : `
-      <a href="index.html" class="header-logo">
+      <a href="${homeHref}" class="header-logo">
         <div>
           <div class="header-logo-text">STRAY7</div>
           <div class="header-logo-sub">K-Pop Games</div>
@@ -30,9 +62,10 @@ function injectHeader() {
       </a>
     `}
     ${showNav ? `<nav class="header-nav">
-      ${NAV_LINKS.map(l => `
-        <a href="${l.href}" class="${l.href === currentPage ? 'active' : ''}">${l.label}</a>
-      `).join("")}
+      ${NAV_LINKS.map(l => {
+        const navHref = getNavLink(l.href);
+        return `<a href="${navHref}" class="${l.href === currentPage ? 'active' : ''}">${l.label}</a>`;
+      }).join("")}
     </nav>` : ""}
     <div class="header-right">
       <span class="header-badge">v0.4.0</span>
@@ -58,7 +91,8 @@ let draftWarningContainer = null;
 
 //f:irParaDraft
 function irParaDraft() {
-  window.location.href = "draftconfig.html";
+  const draftHref = getNavLink("draftconfig.html");
+  window.location.href = draftHref;
 }
 
 //f:modoEmDesenvolvimento
@@ -446,7 +480,8 @@ function iniciarDraft() {
     usarMusica,
     usarProdutor
   }));
-  window.location.href = "draftgame.html";
+  const draftgameHref = getGamePageHref("draftgame.html");
+  window.location.href = draftgameHref;
 }
 
 //inicializar

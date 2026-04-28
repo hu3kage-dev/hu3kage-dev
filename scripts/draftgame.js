@@ -807,7 +807,10 @@ function encerrarDraft() {
     btn.innerText = "Fase de Simulação";
     btn.style.backgroundColor = "#7e22ce";
     btn.style.border = "2px solid yellow";
-    btn.onclick = () => { window.location.href = "simulacao.html"; };
+    btn.onclick = () => { 
+      const simulacaoHref = getGamePageHref("simulacao.html");
+      window.location.href = simulacaoHref;
+    };
   }
 }
 
