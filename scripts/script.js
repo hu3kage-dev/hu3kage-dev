@@ -1,8 +1,60 @@
-//variáveis
+// ========================
+// HEADER — injetado em todas as páginas que carregarem este script
+// ========================
+const NAV_LINKS = [
+  { label: "Início",        href: "index.html" },
+  { label: "Draft",         href: "draftconfig.html" },
+  { label: "Patch Notes",   href: "patchnotes.html" },
+];
+
+function injectHeader() {
+  const currentPage = location.pathname.split("/").pop() || "index.html";
+  const isGamePage = ["draftgame.html", "simulacao.html"].includes(currentPage);
+  const showNav = !isGamePage;
+  const header = document.createElement("header");
+  header.className = "site-header";
+  header.innerHTML = `
+    ${isGamePage ? `
+      <div class="header-logo disabled-logo">
+        <div>
+          <div class="header-logo-text">STRAY7</div>
+          <div class="header-logo-sub">K-Pop Games</div>
+        </div>
+      </div>
+    ` : `
+      <a href="index.html" class="header-logo">
+        <div>
+          <div class="header-logo-text">STRAY7</div>
+          <div class="header-logo-sub">K-Pop Games</div>
+        </div>
+      </a>
+    `}
+    ${showNav ? `<nav class="header-nav">
+      ${NAV_LINKS.map(l => `
+        <a href="${l.href}" class="${l.href === currentPage ? 'active' : ''}">${l.label}</a>
+      `).join("")}
+    </nav>` : ""}
+    <div class="header-right">
+      <span class="header-badge">v0.4.0</span>
+    </div>
+  `;
+  document.body.prepend(header);
+}
+
+
+// ========================
+// VARIÁVEIS GLOBAIS
+// ========================
 let filtroGeracao = {
   gen4: true,
   gen5: true
 };
+let draftWarningContainer = null;
+
+
+// ========================
+// INDEX PAGE
+// ========================
 
 //f:irParaDraft
 function irParaDraft() {
@@ -14,17 +66,9 @@ function modoEmDesenvolvimento() {
   alert("Este modo de jogo ainda está em desenvolvimento.");
 }
 
-//f:sortearIntegrantes
-function sortearIntegrantes() {
-  let chance = Math.random();
-  let valor;
-  if (chance <= 0.95) {
-    valor = Math.floor(Math.random() * 9) + 4;
-  } else {
-    valor = Math.floor(Math.random() * 12) + 13;
-  }
-  document.getElementById("idolCount").value = valor;
-}
+// ========================
+// FUNÇÕES DE BLOCOS
+// ========================
 
 //f:criarInputsJogadores
 function criarInputsJogadores() {
@@ -38,6 +82,18 @@ function criarInputsJogadores() {
     container.appendChild(input);
     container.appendChild(document.createElement("br"));
   }
+}
+
+//f:sortearIntegrantes
+function sortearIntegrantes() {
+  let chance = Math.random();
+  let valor;
+  if (chance <= 0.95) {
+    valor = Math.floor(Math.random() * 9) + 4;
+  } else {
+    valor = Math.floor(Math.random() * 12) + 13;
+  }
+  document.getElementById("idolCount").value = valor;
 }
 
 //f:agruparPorGrupo
@@ -75,6 +131,45 @@ function desmarcarTodasMusicas() {
   document.querySelectorAll("#musicContainer input[type='checkbox']")
     .forEach(cb => cb.checked = false);
 }
+
+// ========================
+// AVISOS
+// ======================== 
+
+//f:initDraftWarning
+function initDraftWarning() {
+  const button = document.querySelector(".btn-iniciar-draft");
+  if (!button) return;
+  draftWarningContainer = document.createElement("div");
+  draftWarningContainer.id = "draftWarning";
+  draftWarningContainer.style.margin = "10px 0 0 0";
+  draftWarningContainer.style.padding = "12px";
+  draftWarningContainer.style.borderRadius = "8px";
+  draftWarningContainer.style.backgroundColor = "#3a1a1a";
+  draftWarningContainer.style.color = "#ffd9d9";
+  draftWarningContainer.style.border = "1px solid #b35b5b";
+  draftWarningContainer.style.display = "none";
+  draftWarningContainer.style.fontSize = "14px";
+  button.insertAdjacentElement("beforebegin", draftWarningContainer);
+}
+
+//f:setDraftWarning
+function setDraftWarning(messages) {
+  if (!draftWarningContainer) return;
+  if (!messages || messages.length === 0) {
+    draftWarningContainer.style.display = "none";
+    draftWarningContainer.innerHTML = "";
+    return;
+  }
+  draftWarningContainer.style.display = "block";
+  draftWarningContainer.innerHTML = messages
+    .map(msg => `<p style="margin:0 0 6px 0;">${msg}</p>`)
+    .join("");
+}
+
+// ========================
+// FUNÇÕES DE RENDERIZAÇÃO
+// ========================
 
 //f:renderizarGrupos
 function renderizarGrupos() {
@@ -179,135 +274,12 @@ function renderizarMusicas() {
   });
 }
 
-//f:pegarMusicasSelecionadas
-function pegarMusicasSelecionadas() {
-  let selecionados = [];
-  document.querySelectorAll("#musicContainer input[type='checkbox']").forEach(cb => {
-    if (cb.checked && cb.value) {
-      let music = musics.find(m => m.name === cb.value);
-      if (music) selecionados.push(music);
-    }
-  });
-  return selecionados;
-}
-
-//f:pegarIdolsSelecionados
-function pegarIdolsSelecionados() {
-  let selecionados = [];
-  const checkboxes = document.querySelectorAll("#groupsContainer input[type='checkbox']");
-  checkboxes.forEach(cb => {
-    if (cb.checked && cb.value) {
-      let idol = idols.find(i => i.id === cb.value);
-      if (idol) selecionados.push(idol);
-    }
-  });
-  return selecionados;
-}
-
-//f:pegarProdutoresSelecionados
-function pegarProdutoresSelecionados() {
-  let selecionados = [];
-  document.querySelectorAll("#producerContainer input[type='checkbox']").forEach(cb => {
-    if (cb.checked && cb.value) {
-      let producer = producers.find(p => p.name === cb.value);
-      if (producer) selecionados.push(producer);
-    }
-  });
-  return selecionados;
-}
-
-//f:sortearIdols
-function sortearIdols(lista, quantidade) {
-  let copia = [...lista];
-  let resultado = [];
-  for (let i = 0; i < quantidade; i++) {
-    let index = Math.floor(Math.random() * copia.length);
-    resultado.push(copia[index]);
-    copia.splice(index, 1);
-  }
-  return resultado;
-}
-
-//f:pegarProdutoresSelecionados
-function pegarProdutoresSelecionados() {
-  let selecionados = [];
-  const checkboxes = document.querySelectorAll("#producerContainer input[type='checkbox']");
-  checkboxes.forEach(cb => {
-    if (cb.checked && cb.value) {
-      let producer = producers.find(p => p.name === cb.value);
-      if (producer) selecionados.push(producer);
-    }
-  });
-  return selecionados;
-}
-
-//f:pegarMusicasSelecionadas
-function pegarMusicasSelecionadas() {
-  let selecionados = [];
-  const checkboxes = document.querySelectorAll("#musicContainer input[type='checkbox']");
-  checkboxes.forEach(cb => {
-    if (cb.checked && cb.value) {
-      let music = musics.find(m => m.name === cb.value);
-      if (music) selecionados.push(music);
-    }
-  });
-  return selecionados;
-}
-
-//f:iniciarDraft
-function iniciarDraft() {
-  let jogadores = [];
-  let inputs = document.querySelectorAll(".playerNameInput");
-  inputs.forEach(input => {
-    if (input.value.trim()) {
-      jogadores.push(input.value.trim());
-    }
-  });
-  let integrantes = parseInt(document.getElementById("idolCount").value);
-  let musicasSelecionadas = pegarMusicasSelecionadas();
-  let produtoresSelecionados = pegarProdutoresSelecionados();
-  let usarMusica = musicasSelecionadas.length > 0;
-  let usarProdutor = produtoresSelecionados.length > 0;
-  let pool = [];
-  //idols
-  let selecionados = pegarIdolsSelecionados();
-  let totalIdols = jogadores.length * integrantes;
-  pool = pool.concat(sortearIdols(selecionados, totalIdols));
-  //music
-  if (usarMusica) { 
-    let musicas = sortearIdols(musicasSelecionadas, jogadores.length);
-    musicas.forEach(m => m.type = "music");
-    pool = pool.concat(musicas);
-  }
-  //producer
-  if (usarProdutor) {
-    let produtores = sortearIdols(produtoresSelecionados, jogadores.length);
-    produtores.forEach(p => p.type = "producer");
-    pool = pool.concat(produtores);
-  }
-  //garantir idol type
-  pool = pool.map(item => ({
-    ...item,
-    type: item.type || "idol"
-  }));
-  localStorage.setItem("draftData", JSON.stringify({
-    jogadores,
-    integrantes,
-    pool,
-    usarMusica,
-    usarProdutor
-  }));
-  window.location.href = "draftgame.html";
-}
-
 //f:aplicarFiltroGeracao
 function aplicarFiltroGeracao() {
   const gen4Checked = document.getElementById("gen4Filter")?.checked || false;
   const gen5Checked = document.getElementById("gen5Filter")?.checked || false;
-  
   filtroGeracao.gen4 = gen4Checked;
-  filtroGeracao.gen5 = gen5Checked;
-  
+  filtroGeracao.gen5 = gen5Checked;  
   renderizarGrupos();
 }
 
@@ -353,11 +325,137 @@ function atualizarCheckboxesGrupo() {
   });
 }
 
+// ==============================
+// FUNÇÕES DE SORTEIO E SELEÇÃO
+// ==============================
+
+//f:pegarIdolsSelecionados
+function pegarIdolsSelecionados() {
+  let selecionados = [];
+  const checkboxes = document.querySelectorAll("#groupsContainer input[type='checkbox']");
+  checkboxes.forEach(cb => {
+    if (cb.checked && cb.value) {
+      let idol = idols.find(i => i.id === cb.value);
+      if (idol) selecionados.push(idol);
+    }
+  });
+  return selecionados;
+}
+
+//f:pegarMusicasSelecionadas
+function pegarMusicasSelecionadas() {
+  let selecionados = [];
+  document.querySelectorAll("#musicContainer input[type='checkbox']").forEach(cb => {
+    if (cb.checked && cb.value) {
+      let music = musics.find(m => m.name === cb.value);
+      if (music) selecionados.push(music);
+    }
+  });
+  return selecionados;
+}
+
+//f:pegarProdutoresSelecionados
+function pegarProdutoresSelecionados() {
+  let selecionados = [];
+  document.querySelectorAll("#producerContainer input[type='checkbox']").forEach(cb => {
+    if (cb.checked && cb.value) {
+      let producer = producers.find(p => p.name === cb.value);
+      if (producer) selecionados.push(producer);
+    }
+  });
+  return selecionados;
+}
+
+//f:sortearIdols
+function sortearIdols(lista, quantidade) {
+  let copia = [...lista];
+  let resultado = [];
+  for (let i = 0; i < quantidade; i++) {
+    let index = Math.floor(Math.random() * copia.length);
+    resultado.push(copia[index]);
+    copia.splice(index, 1);
+  }
+  return resultado;
+}
+
+// ========================
+// INICIALIZAÇÃO DO DRAFT
+// ========================
+
+//f:iniciarDraft
+function iniciarDraft() {
+  let jogadores = [];
+  let inputs = document.querySelectorAll(".playerNameInput");
+  inputs.forEach(input => {
+    if (input.value.trim()) {
+      jogadores.push(input.value.trim());
+    }
+  });
+  let integrantes = parseInt(document.getElementById("idolCount").value, 10) || 0;
+  let musicasSelecionadas = pegarMusicasSelecionadas();
+  let produtoresSelecionados = pegarProdutoresSelecionados();
+  let selecionados = pegarIdolsSelecionados();
+  let totalIdols = jogadores.length * integrantes;
+  const errors = [];
+  if (produtoresSelecionados.length < jogadores.length) {
+    errors.push("O número de produtores deve ser maior ou igual ao número de jogadores.");
+  }
+  if (musicasSelecionadas.length < jogadores.length) {
+    errors.push("O número de músicas deve ser maior ou igual ao número de jogadores.");
+  }
+  if (selecionados.length < totalIdols) {
+    errors.push("O número de idols selecionados é menor do que a quantidade mínima necessária para iniciar o draft. (Deve ser igual ao número de jogadores multiplicado pelo número de integrantes)");
+  }
+  if (integrantes <= 0) {
+    errors.push("O tamanho do grupo deve ser um número positivo.");
+  }
+  if (jogadores.length <= 0) {
+    errors.push("Informe pelo menos um jogador para iniciar o draft.");
+  }
+  if (errors.length > 0) {
+    setDraftWarning(errors);
+    return;
+  }
+  setDraftWarning([]);
+  let usarMusica = musicasSelecionadas.length > 0;
+  let usarProdutor = produtoresSelecionados.length > 0;
+  let pool = [];
+  //idols
+  pool = pool.concat(sortearIdols(selecionados, totalIdols));
+  //music
+  if (usarMusica) {
+    let musicas = sortearIdols(musicasSelecionadas, jogadores.length);
+    musicas.forEach(m => m.type = "music");
+    pool = pool.concat(musicas);
+  }
+  //producer
+  if (usarProdutor) {
+    let produtores = sortearIdols(produtoresSelecionados, jogadores.length);
+    produtores.forEach(p => p.type = "producer");
+    pool = pool.concat(produtores);
+  }
+  //garantir idol type
+  pool = pool.map(item => ({
+    ...item,
+    type: item.type || "idol"
+  }));
+  localStorage.setItem("draftData", JSON.stringify({
+    jogadores,
+    integrantes,
+    pool,
+    usarMusica,
+    usarProdutor
+  }));
+  window.location.href = "draftgame.html";
+}
+
 //inicializar
-window.onload = function () {
+window.addEventListener("load", () => {
+  injectHeader();
+  initDraftWarning();
   renderizarGrupos();
   renderizarProdutores();
   renderizarMusicas();
-};
+});
 
 //tá lendo isso por quê, curioso?

@@ -60,17 +60,21 @@ function inicializarAviso() {
   avisoTurno = document.createElement("div");
   avisoTurno.id = "avisoTurno";
   avisoTurno.style.margin = "10px 0";
-  avisoTurno.style.padding = "12px";
+  avisoTurno.style.padding = "0 16px";
   avisoTurno.style.borderRadius = "8px";
   avisoTurno.style.backgroundColor = "#3a1a1a";
   avisoTurno.style.color = "#ffd9d9";
   avisoTurno.style.border = "1px solid #b35b5b";
   avisoTurno.style.display = "none";
-  avisoTurno.style.minHeight = "24px";
+  avisoTurno.style.minHeight = "44px";
+  avisoTurno.style.height = "44px";
+  avisoTurno.style.lineHeight = "44px";
   avisoTurno.style.fontSize = "14px";
+  avisoTurno.style.alignItems = "center";
+  avisoTurno.style.justifyContent = "center";
   const botaoTurno = document.querySelector("#gameScreen button");
   if (botaoTurno) {
-    botaoTurno.insertAdjacentElement("afterend", avisoTurno);
+    botaoTurno.insertAdjacentElement("beforebegin", avisoTurno);
   } else {
     gameScreen.insertBefore(avisoTurno, gameScreen.firstChild);
   }
@@ -297,7 +301,7 @@ function mostrarAviso(texto) {
     avisoTurno.innerText = "";
     return;
   }
-  avisoTurno.style.display = "block";
+  avisoTurno.style.display = "flex";
   avisoTurno.innerText = texto;
 }
 
@@ -566,9 +570,9 @@ function getCardImageCandidates(item) {
     if (itemType === "idol") {
       const groupSlug = item.group;
       const query = encodeURIComponent(`${groupSlug} ${nameSlug}`);
-      candidates.push(`./assets/images/idol_${idSlug}.jpg`);
-      candidates.push(`./assets/images/idol_${idSlug}.png`);
-      candidates.push(`./assets/images/idol_${idSlug}.jpeg`);
+      candidates.push(`../assets/images/idol_${idSlug}.jpg`);
+      candidates.push(`../assets/images/idol_${idSlug}.png`);
+      candidates.push(`../assets/images/idol_${idSlug}.jpeg`);
       candidates.push(`https://dummyimage.com/160x200/ffff00/000000&text=${query}`);
       candidates.push(`https://via.placeholder.com/160x200/ffff00/000000?text=${query}`);
       return candidates;
@@ -578,9 +582,9 @@ function getCardImageCandidates(item) {
     const fonteSlug = sanitize(item.fonte || "");
     const query = encodeURIComponent(`${fonteSlug} ${nameSlug}`);
     if (fonteSlug) {
-      candidates.push(`./assets/images/music_${idSlug}.jpg`);
-      candidates.push(`./assets/images/music_${idSlug}.png`);
-      candidates.push(`./assets/images/music_${idSlug}.jpeg`);
+      candidates.push(`../assets/images/music_${idSlug}.jpg`);
+      candidates.push(`../assets/images/music_${idSlug}.png`);
+      candidates.push(`../assets/images/music_${idSlug}.jpeg`);
     }
     candidates.push(`https://dummyimage.com/160x200/0000ff/ffffff&text=${query}`);
     candidates.push(`https://via.placeholder.com/160x200/0000ff/ffffff?text=${query}`);
@@ -589,17 +593,17 @@ function getCardImageCandidates(item) {
 
   if (itemType === "producer") {
     const query = encodeURIComponent(`Producer ${nameSlug}`);
-    candidates.push(`./assets/images/producer_${idSlug}.jpg`);
-    candidates.push(`./assets/images/producer_${idSlug}.png`);
-    candidates.push(`./assets/images/producer_${idSlug}.jpeg`);
+    candidates.push(`../assets/images/producer_${idSlug}.jpg`);
+    candidates.push(`../assets/images/producer_${idSlug}.png`);
+    candidates.push(`../assets/images/producer_${idSlug}.jpeg`);
     candidates.push(`https://dummyimage.com/160x200/800080/ffffff&text=${query}`);
     candidates.push(`https://via.placeholder.com/160x200/800080/ffffff?text=${query}`);
     return candidates;
   }
 
-  candidates.push(`./assets/images/${itemType}_${idSlug}.jpg`);
-  candidates.push(`./assets/images/${itemType}_${idSlug}.png`);
-  candidates.push(`./assets/images/${itemType}_${idSlug}.jpeg`);
+  candidates.push(`../assets/images/${itemType}_${idSlug}.jpg`);
+  candidates.push(`../assets/images/${itemType}_${idSlug}.png`);
+  candidates.push(`../assets/images/${itemType}_${idSlug}.jpeg`);
 
   return candidates;
 }
@@ -656,9 +660,9 @@ function criarCard(item, origem = "pool", playerIndex = null, slotIndex = null) 
         .toString()
         .replace(/\s+/g, "_")
         .replace(/[^a-zA-Z0-9_\-]/g, "");
-      img.src = `./assets/images/idol_${fallbackGroup}_${fallbackName}.jpg`;
+      img.src = `../assets/images/idol_${fallbackGroup}_${fallbackName}.jpg`;
     } else {
-      img.src = `./assets/images/${fallbackType}_${fallbackName}.jpg`;
+      img.src = `../assets/images/${fallbackType}_${fallbackName}.jpg`;
     }
   };
   let label = document.createElement("div");

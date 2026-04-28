@@ -1,30 +1,26 @@
 /* ===============
-  estilos globais
+  estilos específicos simulacao.html
 ================ */
-body {
-  font-family: Arial, sans-serif;
-  background-color: #111;
-  color: #eee;
-  padding: 20px;
-  text-align: center;
-}
-
-h1 {
-  margin-bottom: 20px;
-  color: #a855f7;
-}
 
 /* =====================
   simulacao.html
 ===================== */
 
+h2 {
+  margin-top: 18px;
+  color: #d8b4fe;
+}
+
 /* Seção por Jogador */
 .simSection {
   margin-bottom: 30px;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Linha do Jogador */
-.simPlayerRow { /* playerRow */
+.simPlayerRow {
   display: flex;
   align-items: flex-start;
   gap: 15px;
@@ -34,7 +30,7 @@ h1 {
   width: 100%;
 }
 
-.simMeta { /* playerInfo */
+.simMeta {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -44,13 +40,13 @@ h1 {
   flex-shrink: 0;
 }
 
-.simPos { /* playerOrder */
+.simPos {
   font-weight: bold;
   font-size: 24px;
   color: #a855f7;
 }
 
-.simName { /* playerName */
+.simName {
   font-weight: bold;
   font-size: 24px;
   color: #fff;
@@ -65,10 +61,10 @@ h1 {
   flex: 1;
   padding: 8px;
   min-width: 0;
-  background: #111;
+  background: #0a0a0a;
 }
 
-.simBoardTitle { /* boardTitle */
+.simBoardTitle { 
   color: white;
   font-size: 14px;
   font-weight: bold;
@@ -93,7 +89,7 @@ h1 {
   padding: 8px 6px;
   border-radius: 6px;
   gap: 4px;
-  background: #111;
+  background: #0a0a0a;
 }
 
 .simExtraTitle {
@@ -138,9 +134,9 @@ h1 {
 .roleSelect {
   width: 90px;
   font-size: 10px;
-  background: #2a2a2a;
-  color: #fff;
-  border: 1px solid #555;
+  background: rgba(45, 36, 69, 0.8);
+  color: #f4efff;
+  border: 1px solid rgba(168, 85, 247, 0.18);
   border-radius: 3px;
   padding: 2px 3px;
   cursor: pointer;
@@ -173,43 +169,45 @@ h1 {
 
 /* Botão Travar */
 .btnTravar {
-  background-color: #7e22ce;
-  border: 2px solid yellow;
+  background-color: #7f56d9;
+  border: none;
   color: white;
-  padding: 10px 14px;
-  border-radius: 5px;
+  padding: 12px 24px;
+  border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
   align-self: center;
   flex-shrink: 0;
   font-size: 13px;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease;
+  margin: 0;
 }
 
 .btnTravar:hover:not(:disabled) {
-  background-color: #6b21a8;
+  background-color: #6e3dc3;
 }
 
 .btnTravado {
-  background-color: #2a2a2a;
-  border-color: #555;
-  color: #888;
+  background-color: #3d3a4d;
+  border: none;
+  color: #b9b3c8;
   cursor: not-allowed;
 }
 
 /* Pool */
 .simPoolSection {
-  background: #161616;
-  border-top: 1px solid #333;
-  padding: 10px 10px 14px;
-  margin-top: 6px;
+  margin-left: 220px;
+  margin-right: 220px;
+  max-width: 1180px;
+  margin-top: 24px;
 }
 
 .simPoolHeader {
   font-weight: bold;
-  font-size: 16px;
-  color: white;
-  margin-bottom: 10px;
+  font-size: 18px;
+  color: #d8b4fe;
+  margin-bottom: 12px;
+  text-align: left;
 }
 
 .simPoolHeader strong {
@@ -220,8 +218,14 @@ h1 {
 .simPoolCards {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  min-height: 40px;
+  gap: 12px;
+  min-height: 125px;
+  padding: 16px;
+  border: 2px solid rgba(34, 255, 255, 0.25);
+  border-radius: 16px;
+  background: rgba(0, 255, 255, 0.04);
+  justify-content: flex-start;
+  align-content: flex-start;
 }
 
 .simPoolCardWrap {

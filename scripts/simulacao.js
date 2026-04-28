@@ -285,7 +285,7 @@ function render() {
     poolSection.className = "simPoolSection";
     const poolHeader = document.createElement("div");
     poolHeader.className = "simPoolHeader";
-    poolHeader.innerHTML = `<strong>Pool</strong> Pessoal de ${nome}`;
+    poolHeader.innerText = `Pool pessoal de ${nome}`;
     poolSection.appendChild(poolHeader);
 
     const poolWrap = document.createElement("div");
@@ -391,9 +391,9 @@ function getCardImageCandidates(item) {
   if (itemType === "idol") {
     const groupSlug = item.group;
     const query = encodeURIComponent(`${groupSlug} ${nameSlug}`);
-    candidates.push(`./assets/images/idol_${idSlug}.jpg`);
-    candidates.push(`./assets/images/idol_${idSlug}.png`);
-    candidates.push(`./assets/images/idol_${idSlug}.jpeg`);
+    candidates.push(`../assets/images/idol_${idSlug}.jpg`);
+    candidates.push(`../assets/images/idol_${idSlug}.png`);
+    candidates.push(`../assets/images/idol_${idSlug}.jpeg`);
     candidates.push(`https://dummyimage.com/160x200/ffff00/000000&text=${query}`);
     candidates.push(`https://via.placeholder.com/160x200/ffff00/000000?text=${query}`);
     return candidates;
@@ -403,9 +403,9 @@ function getCardImageCandidates(item) {
     const fonteSlug = sanitizeSlug(item.fonte || "");
     const query = encodeURIComponent(`${fonteSlug} ${nameSlug}`);
     if (fonteSlug) {
-      candidates.push(`./assets/images/music_${idSlug}.jpg`);
-      candidates.push(`./assets/images/music_${idSlug}.png`);
-      candidates.push(`./assets/images/music_${idSlug}.jpeg`);
+      candidates.push(`../assets/images/music_${idSlug}.jpg`);
+      candidates.push(`../assets/images/music_${idSlug}.png`);
+      candidates.push(`../assets/images/music_${idSlug}.jpeg`);
     }
     candidates.push(`https://dummyimage.com/160x200/0000ff/ffffff&text=${query}`);
     candidates.push(`https://via.placeholder.com/160x200/0000ff/ffffff?text=${query}`);
@@ -414,16 +414,16 @@ function getCardImageCandidates(item) {
 
   if (itemType === "producer") {
     const query = encodeURIComponent(`Producer ${nameSlug}`);
-    candidates.push(`./assets/images/producer_${idSlug}.jpg`);
-    candidates.push(`./assets/images/producer_${idSlug}.png`);
-    candidates.push(`./assets/images/producer_${idSlug}.jpeg`);
+    candidates.push(`../assets/images/producer_${idSlug}.jpg`);
+    candidates.push(`../assets/images/producer_${idSlug}.png`);
+    candidates.push(`../assets/images/producer_${idSlug}.jpeg`);
     candidates.push(`https://dummyimage.com/160x200/800080/ffffff&text=${query}`);
     candidates.push(`https://via.placeholder.com/160x200/800080/ffffff?text=${query}`);
     return candidates;
   }
 
-  candidates.push(`./assets/images/${itemType}_${idSlug}.jpg`);
-  candidates.push(`./assets/images/${itemType}_${idSlug}.png`);
+  candidates.push(`../assets/images/${itemType}_${idSlug}.jpg`);
+  candidates.push(`../assets/images/${itemType}_${idSlug}.png`);
   return candidates;
 }
 
