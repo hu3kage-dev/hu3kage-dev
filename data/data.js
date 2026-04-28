@@ -6160,22 +6160,6 @@ const idols = [
     "fortes": "Estabilidade vocal de suporte / presença visível",
     "fracos": "Técnica de rap/dança ainda menos refinada"
   },
-  {
-    "gen": "4",
-    "type": "Idol",
-    "id": "saborteachergabi",
-    "name": "Teacher Gabi",
-    "group": "Sabor",
-    "vocal": "S",
-    "dance": "S",
-    "rap": "S",
-    "center": "S",
-    "visual": "S",
-    "especialidade": "",
-    "conceito": "Divino / Teacher / Sabor / Brasileira",
-    "fortes": "Invoca todos os brasileiros pro fandom",
-    "fracos": "Fala 'aurea' em vez de aura e escreve desonto"
-  }
 ];
 
 //data:musics
