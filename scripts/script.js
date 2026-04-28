@@ -17,13 +17,15 @@ const NAV_LINKS = [
 function getNavLink(href) {
   const base = getBaseHref();
   const isScreensPage = location.pathname.includes('/screens/');
+  const screenPages = ["draftconfig.html", "patchnotes.html"];
+  
   if (isScreensPage) {
-    if (href === "draftconfig.html") {
+    if (screenPages.includes(href)) {
       return href;
     }
     return `${base}${href}`;
   }
-  if (href === "draftconfig.html") {
+  if (screenPages.includes(href)) {
     return `screens/${href}`;
   }
   return href;
