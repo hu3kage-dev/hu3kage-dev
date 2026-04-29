@@ -13,7 +13,7 @@
   text-align: center;
   margin-bottom: 40px;
   padding-bottom: 24px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 .patchnotes-header h1 {
@@ -162,9 +162,8 @@
 }
 
 .patch-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  position: relative;
+  padding-left: 12px;
   font-size: 13px;
   color: #bbb;
   line-height: 1.5;
@@ -173,8 +172,9 @@
 
 .patch-list li::before {
   content: '›';
-  flex-shrink: 0;
-  margin-top: 1px;
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 
 .patch-section-title.new    + .patch-list li::before { color: #a855f7; }

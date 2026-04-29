@@ -273,12 +273,29 @@ function render() {
     // Botão travar
     const btn = document.createElement("button");
     const pronto = podeTravar(pi);
-    btn.className = "btnTravar" + (isLocked ? " btnTravado" : "");
+    btn.className = "btnTravar" + (isLocked ? " btnTravado" : "") + (!pronto ? " btnDesabilitado" : "");
     btn.innerText = isLocked ? "🔒 Travado" : "Travar Escolha";
-    btn.disabled  = isLocked || !pronto;
+    btn.disabled  = isLocked;
     if (!isLocked && !pronto) btn.title = "Preencha todos os slots e defina todos os papéis";
-    btn.onclick   = () => { lockedPlayers[pi] = true; render(); };
-    playerRow.appendChild(btn);
+    btn.onclick   = () => {
+      if (pronto) {
+        lockedPlayers[pi] = true;
+        render();
+      } else {
+        mostrarMensagemErro(pi, "Preencha todos os slots e defina todos os papéis antes de travar a escolha.");
+      }
+    };
+    const btnWrapper = document.createElement("div");
+    btnWrapper.className = "btnTravarWrapper";
+
+    const msgErro = document.createElement("div");
+    msgErro.className = "simMensagemErro";
+    msgErro.id = `msgErro-${pi}`;
+    msgErro.style.display = "none";
+    btnWrapper.appendChild(msgErro);
+
+    btnWrapper.appendChild(btn);
+    playerRow.appendChild(btnWrapper);
     section.appendChild(playerRow);
     // Pool pessoal
     const poolSection = document.createElement("div");
@@ -561,6 +578,19 @@ function podeTravar(pi) {
     }
   }
   return true;
+}
+
+//f:mostrarMensagemErro
+function mostrarMensagemErro(pi, mensagem) {
+  const msgElement = document.getElementById(`msgErro-${pi}`);
+  if (msgElement) {
+    msgElement.innerText = mensagem;
+    msgElement.style.display = "block";
+    // Esconder após 5 segundos
+    setTimeout(() => {
+      msgElement.style.display = "none";
+    }, 5000);
+  }
 }
 
 //tá lendo isso por quê, curioso?

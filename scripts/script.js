@@ -422,23 +422,35 @@ function sortearIdols(lista, quantidade) {
 
 //f:iniciarDraft
 function iniciarDraft() {
-  let jogadores = [];
   let inputs = document.querySelectorAll(".playerNameInput");
+  let jogadores = [];
+  let allNames = [];
   inputs.forEach(input => {
-    if (input.value.trim()) {
-      jogadores.push(input.value.trim());
-    }
+    allNames.push(input.value.trim());
   });
+  const nomesVazios = allNames.filter(nome => nome === "");
+  if (nomesVazios.length > 0) {
+    jogadores = allNames.filter(nome => nome !== "");
+  } else {
+    jogadores = [...allNames];
+  }
   let integrantes = parseInt(document.getElementById("idolCount").value, 10) || 0;
   let musicasSelecionadas = pegarMusicasSelecionadas();
   let produtoresSelecionados = pegarProdutoresSelecionados();
   let selecionados = pegarIdolsSelecionados();
   let totalIdols = jogadores.length * integrantes;
   const errors = [];
-  if (produtoresSelecionados.length < jogadores.length) {
+  if (nomesVazios.length > 0) {
+    errors.push("Preencha o nome de todos os jogadores.");
+  }
+  const nomesUnicos = new Set(jogadores.map(nome => nome.toLowerCase()));
+  if (jogadores.length > 0 && nomesUnicos.size !== jogadores.length) {
+    errors.push("Cada jogador deve ter um nome único.");
+  }
+  if (produtoresSelecionados.length > 0 && produtoresSelecionados.length < jogadores.length) {
     errors.push("O número de produtores deve ser maior ou igual ao número de jogadores.");
   }
-  if (musicasSelecionadas.length < jogadores.length) {
+  if (musicasSelecionadas.length > 0 && musicasSelecionadas.length < jogadores.length) {
     errors.push("O número de músicas deve ser maior ou igual ao número de jogadores.");
   }
   if (selecionados.length < totalIdols) {
