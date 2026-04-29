@@ -26,6 +26,7 @@ const PATCHES = [
           "Uma validação foi adicionada para impedir que o mesmo nome de jogador seja adicionado mais de uma vez, garantindo que cada jogador tenha um nome único no draft.",
           "Ajustado o visual do botão de Travar Escolha para indicar claramente quando ele está habilitado ou desabilitado, melhorando a experiência do usuário durante a fase de simulação.",
           "Um aviso é emitido se o jogador tentar clicar no botão de <span class='hl'>Travar Escolha</span> sem que todos os slots estejam preenchidos ou sem que todos os roles estejam atribuídos.",
+          "Os Cards retornam para sua posição original do Pool caso seja trocado ou devolvido.",
         ]
       }
     ]
