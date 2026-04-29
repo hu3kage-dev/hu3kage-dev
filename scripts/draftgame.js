@@ -110,7 +110,8 @@ function iniciarDrag(e, item, origem, playerIndex = null, slotIndex = null) {
   dragOrigin = origem;
   //criar payload
   if (origem === "pool") {
-    dragPayload = { ...item, fromPool: true };
+    let poolIndex = pool.findIndex(p => p.id === item.id);
+    dragPayload = { ...item, fromPool: true, poolIndex };
   } else {
     dragPayload = { ...item, fromPlayer: playerIndex, fromIndex: slotIndex };
   }
@@ -234,44 +235,60 @@ function executarDropNoSlot(slot, data) {
   }
   //vindo do pool
   if (data.fromPool) {
-    let itemNovo = data;
-    if (getItemType(itemNovo) !== tipo) return;
-    let remocaoAntiga = null;
-    if (escolhaDoTurno) {
-      remocaoAntiga = desfazerEscolhaDoTurno(playerIndex);
-    }
-    let lista = picks[playerIndex][tipo];
-    if (tipo === "idol") {
-      let vazio = lista.findIndex(x => !x);
-      if (vazio !== -1) {
-        lista[vazio] = itemNovo;
-      } else {
-        let indexSwap = lista.findIndex(x => x && !x.locked);
-        if (indexSwap === -1) {
-          if (remocaoAntiga) {
-            restaurarEscolhaDoTurno(remocaoAntiga, playerIndex);
-          }
-          return;
-        }
-        pool.push(lista[indexSwap]);
-        lista[indexSwap] = itemNovo;
-      }
+  let itemNovo = data;
+  if (getItemType(itemNovo) !== tipo) return;
+  // Captura o index original ANTES de qualquer splice
+  let originalIndex = data.poolIndex;
+  let remocaoAntiga = null;
+  if (escolhaDoTurno) {
+    remocaoAntiga = desfazerEscolhaDoTurno(playerIndex);
+    // Após desfazer, o pool mudou — recalcula onde o item novo está agora
+    originalIndex = pool.findIndex(p => p.id === itemNovo.id);
+  }
+  let lista = picks[playerIndex][tipo];
+  if (tipo === "idol") {
+    let vazio = lista.findIndex(x => !x);
+    if (vazio !== -1) {
+      lista[vazio] = itemNovo;
+      itemNovo.originalPoolIndex = originalIndex;
     } else {
-      let atual = lista[0];
-      if (atual && atual.locked) {
-        if (remocaoAntiga) {
-          restaurarEscolhaDoTurno(remocaoAntiga, playerIndex);
-        }
+      let indexSwap = lista.findIndex(x => x && !x.locked);
+      if (indexSwap === -1) {
+        if (remocaoAntiga) restaurarEscolhaDoTurno(remocaoAntiga, playerIndex);
         return;
       }
-      if (atual) pool.push(atual);
-      lista[0] = itemNovo;
+      let itemSubstituido = lista[indexSwap];
+      // Remove o novo do pool primeiro para não deslocar o index do substituído
+      pool = pool.filter(p => p.id !== itemNovo.id);
+      let insertIndex = itemSubstituido.originalPoolIndex !== undefined
+        ? Math.min(itemSubstituido.originalPoolIndex, pool.length)
+        : pool.length;
+      pool.splice(insertIndex, 0, itemSubstituido);
+      lista[indexSwap] = itemNovo;
+      itemNovo.originalPoolIndex = originalIndex;
     }
-    pool = pool.filter(p => p.id !== itemNovo.id);
-    escolhaDoTurno = itemNovo;
-    jogouNoTurno = true;
-    render();
+  } else {
+    let atual = lista[0];
+    if (atual && atual.locked) {
+      if (remocaoAntiga) restaurarEscolhaDoTurno(remocaoAntiga, playerIndex);
+      return;
+    }
+    if (atual) {
+      pool = pool.filter(p => p.id !== itemNovo.id);
+      let insertIndex = atual.originalPoolIndex !== undefined
+        ? Math.min(atual.originalPoolIndex, pool.length)
+        : pool.length;
+      pool.splice(insertIndex, 0, atual);
+    }
+    lista[0] = itemNovo;
+    itemNovo.originalPoolIndex = originalIndex;
   }
+  // Remove o item novo do pool (caso ainda esteja — para o caso sem substituição)
+  pool = pool.filter(p => p.id !== itemNovo.id);
+  escolhaDoTurno = itemNovo;
+  jogouNoTurno = true;
+  render();
+}
 }
 
 //f:executarDropNoPool
@@ -287,7 +304,9 @@ function executarDropNoPool(data) {
       jogouNoTurno = false;
       mostrarAviso("");
     }
-    pool.push(item);
+    // Inserir na posição original no pool
+    let insertIndex = item.originalPoolIndex !== undefined ? Math.min(item.originalPoolIndex, pool.length) : pool.length;
+    pool.splice(insertIndex, 0, item);
     lista[data.fromIndex] = null;
     render();
   }
@@ -356,6 +375,8 @@ function adicionarItem(item) {
   }
   const itemType = getItemType(item);
   let lista = picks[player][itemType];
+  // Recalcula posição após possível desfazer
+  item.originalPoolIndex = pool.findIndex(p => p.id === item.id);
   if (itemType === "idol") {
     let vazio = lista.findIndex(x => !x);
     if (vazio !== -1) {
@@ -363,13 +384,24 @@ function adicionarItem(item) {
     } else {
       let indexSwap = lista.findIndex(x => x && !x.locked);
       if (indexSwap === -1) return;
-      pool.push(lista[indexSwap]);
+      let itemSubstituido = lista[indexSwap];
+      pool = pool.filter(p => p.id !== item.id);
+      let insertIndex = itemSubstituido.originalPoolIndex !== undefined
+        ? Math.min(itemSubstituido.originalPoolIndex, pool.length)
+        : pool.length;
+      pool.splice(insertIndex, 0, itemSubstituido);
       lista[indexSwap] = item;
     }
   } else {
     let atual = lista[0];
     if (atual && atual.locked) return;
-    if (atual) pool.push(atual);
+    if (atual) {
+      pool = pool.filter(p => p.id !== item.id);
+      let insertIndex = atual.originalPoolIndex !== undefined
+        ? Math.min(atual.originalPoolIndex, pool.length)
+        : pool.length;
+      pool.splice(insertIndex, 0, atual);
+    }
     lista[0] = item;
   }
   pool = pool.filter(p => p.id !== item.id);
@@ -453,14 +485,14 @@ function desfazerEscolhaDoTurno(playerIndex) {
     let lista = picks[playerIndex][tipo];
     if (!lista) continue;
     for (let i = 0; i < lista.length; i++) {
-      if (
-        lista[i] &&
-        lista[i].id === escolhaDoTurno.id &&
-        !lista[i].locked
-      ) {
+      if (lista[i] && lista[i].id === escolhaDoTurno.id && !lista[i].locked) {
         let item = lista[i];
         lista[i] = null;
-        pool.push(item);
+        // Restaura na posição original do pool
+        let insertIndex = item.originalPoolIndex !== undefined
+          ? Math.min(item.originalPoolIndex, pool.length)
+          : pool.length;
+        pool.splice(insertIndex, 0, item);
         escolhaDoTurno = null;
         jogouNoTurno = false;
         mostrarAviso("");
