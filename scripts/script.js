@@ -1,8 +1,7 @@
 // ========================
-// HEADER — injetado em todas as páginas que carregarem este script
+// HEADER GLOBAL
 // ========================
 
-// Detecta se está em uma página dentro de screens/ e ajusta pathings
 //f:getBaseHref
 function getBaseHref() {
   const path = location.pathname;
@@ -31,53 +30,40 @@ function getNavLink(href) {
   return href;
 }
 
-// Função para obter path correto para páginas de jogo (simulacao.html e draftgame.html)
 //f:getGamePageHref
 function getGamePageHref(pageName) {
   const isScreensPage = location.pathname.includes('/screens/');
   if (isScreensPage) {
-    return pageName; // Se já está em screens/, usa direto
+    return pageName;
   }
-  return `screens/${pageName}`; // Se está na raiz, precisa de screens/
+  return `screens/${pageName}`;
 }
 
 //f:injectHeader
 function injectHeader() {
   const currentPage = location.pathname.split("/").pop() || "index.html";
-  const isGamePage = ["draftgame.html", "simulacao.html"].includes(currentPage);
-  const showNav = !isGamePage;
   const header = document.createElement("header");
   header.className = "site-header";
-  const homeHref = getNavLink("index.html");
   header.innerHTML = `
-    ${isGamePage ? `
-      <div class="header-logo disabled-logo">
-        <div>
-          <div class="header-logo-text">STRAY7</div>
-          <div class="header-logo-sub">K-Pop Games</div>
-        </div>
-      </div>
-    ` : `
-      <a href="${homeHref}" class="header-logo">
+      <a href="${getNavLink("index.html")}" class="header-logo">
         <div>
           <div class="header-logo-text">STRAY7</div>
           <div class="header-logo-sub">K-Pop Games</div>
         </div>
       </a>
-    `}
-    ${showNav ? `<nav class="header-nav">
-      ${NAV_LINKS.map(l => {
-        const navHref = getNavLink(l.href);
-        return `<a href="${navHref}" class="${l.href === currentPage ? 'active' : ''}">${l.label}</a>`;
+      <nav class="header-nav">
+      ${NAV_LINKS.map(link => {
+        const navHref = getNavLink(link.href);
+        const ativo = link.href === currentPage ? "active" : "";
+        return `<a href="${navHref}" class="${ativo}">${link.label}</a>`;
       }).join("")}
-    </nav>` : ""}
+    </nav>
     <div class="header-right">
       <span class="header-badge">v0.4.0</span>
     </div>
   `;
   document.body.prepend(header);
 }
-
 
 // ========================
 // VARIÁVEIS GLOBAIS

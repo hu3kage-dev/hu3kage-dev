@@ -316,7 +316,7 @@ body::before {
 
 .b2-field {
   display: grid;
-  grid-template-columns: 1fr minmax(220px, 260px);
+  grid-template-columns: 1fr minmax(220px, 220px);
   align-items: center;
   gap: 10px;
   white-space: nowrap;
@@ -329,8 +329,8 @@ body::before {
 
 .b2-field input[type="number"] {
   width: 100%;
-  min-width: 220px;
-  max-width: 260px;
+  min-width: auto;
+  max-width: auto;
   padding: 10px;
   margin: 0;
   height: 48px;
@@ -358,7 +358,7 @@ body::before {
 
 .players-scroll-box {
   flex: 1;
-  max-height: 180px;
+  max-height: auto;
   overflow-y: auto;
   border: 1px solid rgba(168, 85, 247, 0.14);
   padding: 14px;
@@ -390,13 +390,15 @@ body::before {
 /* Bloco 3 - Seleção de Idols */
 #groupsContainer {
   text-align: left;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
 }
 
 #groupsContainer > div {
   background: rgba(255,255,255,0.03);
   padding: 14px;
   border-radius: 16px;
-  margin-bottom: 10px;
   border: 1px solid rgba(168,85,247,0.12);
 }
 
