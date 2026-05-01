@@ -781,13 +781,15 @@ function extrairNomesBloco(texto, titulo, regex) {
 // EXPORTAR DRAFT
 // ========================
 
-//f:injectBotaoExportar
+//f:injetarBotaoExportar
 function injetarBotaoExportar() {
+  const headerRight = document.querySelector(".header-right");
+  if (!headerRight) return;
   const btn = document.createElement("button");
   btn.id = "btnExportarDraft";
   btn.textContent = "⬇ Exportar Draft";
   btn.onclick = exportarDraft;
-  document.getElementById("turnActions").appendChild(btn);
+  headerRight.insertBefore(btn, headerRight.firstChild);
 }
 
 //f:exportarDraft
@@ -852,5 +854,6 @@ window.addEventListener("load", () => {
   if (document.getElementById("producerContainer")) renderizarProdutores();
   if (document.getElementById("musicContainer"))    renderizarMusicas();
   if (document.querySelector(".btn-iniciar-draft")) iniciarAvisoDraft();
-  if (document.getElementById("turnActions"))       injetarBotaoExportar();
+  const paginaAtual = location.pathname.split("/").pop();
+  if (paginaAtual === "draftgame.html") injetarBotaoExportar();
 });
