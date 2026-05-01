@@ -22,7 +22,8 @@ const PATCHES = [
         type: "fix",
         label: "Correções",
         items: [
-          "O filtro em configuração agora suporta seleção por geração (4ª e 5ª) e por grupo, permitindo uma personalização mais granular do pool de idols para o draft.",
+          "O filtro em configuração agora suporta seleção por geração e por grupo, permitindo uma personalização mais granular do pool de idols para o draft.",
+          "Os botões <span class='hl'>Marcar Todos</span> e <span class='hl'>Desmarcar Todos</span> agora respeitam o filtro aplicado.",
         ]
       }
     ]
