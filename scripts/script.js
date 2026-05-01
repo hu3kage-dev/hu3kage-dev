@@ -68,11 +68,24 @@ function injectHeader() {
 // ========================
 // VARIÁVEIS GLOBAIS
 // ========================
-let filtroGeracao = {
-  gen4: true,
-  gen5: true
+let filtroAtivo = {
+  gen: "all",
+  letra: "all"
 };
 let draftWarningContainer = null;
+
+// ========================
+// DATABASE VOLÁTIL
+// ========================
+// Armazena idols/musics/producers importados em sessão (perdidos ao recarregar)
+let extraIdols     = [];
+let extraMusics    = [];
+let extraProducers = [];
+
+// Retorna a lista ativa mesclando base fixa + importados
+function getIdols()     { return [...idols,     ...extraIdols];     }
+function getMusics()    { return [...musics,     ...extraMusics];    }
+function getProducers() { return [...producers,  ...extraProducers]; }
 
 
 // ========================
@@ -199,17 +212,11 @@ function setDraftWarning(messages) {
 function renderizarGrupos() {
   const container = document.getElementById("groupsContainer");
   container.innerHTML = "";
-  const grupos = agruparPorGrupo(idols);
+  const grupos = agruparPorGrupo(getIdols());
   for (let nomeGrupo in grupos) {
-    // Filtrar idols do grupo por geração
-    const idolsFiltrados = grupos[nomeGrupo].filter(idol => {
-      if (idol.gen === "4" && filtroGeracao.gen4) return true;
-      if (idol.gen === "5" && filtroGeracao.gen5) return true;
-      return false;
-    });
-    //se não há idols filtrados para este grupo, pular
-    if (idolsFiltrados.length === 0) continue;
+    const idolsDoGrupo = grupos[nomeGrupo];
     let divGrupo = document.createElement("div");
+    divGrupo.dataset.grupo = nomeGrupo;
     let checkboxGrupo = document.createElement("input");
     checkboxGrupo.type = "checkbox";
     checkboxGrupo.checked = true;
@@ -218,8 +225,10 @@ function renderizarGrupos() {
     divGrupo.appendChild(checkboxGrupo);
     divGrupo.appendChild(labelGrupo);
     let listaIdolsCheckbox = [];
-    idolsFiltrados.forEach(idol => {
+    idolsDoGrupo.forEach(idol => {
       let divIdol = document.createElement("div");
+      divIdol.dataset.gen = idol.gen || "";
+      divIdol.dataset.nome = idol.name || "";
       let checkboxIdol = document.createElement("input");
       checkboxIdol.type = "checkbox";
       checkboxIdol.checked = true;
@@ -228,14 +237,15 @@ function renderizarGrupos() {
       checkboxIdol.addEventListener("change", () => {
         let todosMarcados = true;
         let nenhumMarcado = true;
-        listaIdolsCheckbox.forEach(cb => {
-          if (cb.checked) {
-            nenhumMarcado = false;
-          } else {
-            todosMarcados = false;
-          }
+        // só conta os visíveis para o estado indeterminate
+        const visiveis = listaIdolsCheckbox.filter(cb => cb.parentElement.style.display !== "none");
+        visiveis.forEach(cb => {
+          if (cb.checked) nenhumMarcado = false;
+          else todosMarcados = false;
         });
-        if (todosMarcados) {
+        if (visiveis.length === 0) {
+          checkboxGrupo.indeterminate = false;
+        } else if (todosMarcados) {
           checkboxGrupo.checked = true;
           checkboxGrupo.indeterminate = false;
         } else if (nenhumMarcado) {
@@ -253,20 +263,24 @@ function renderizarGrupos() {
       divGrupo.appendChild(divIdol);
     });
     checkboxGrupo.addEventListener("change", () => {
+      // só altera os idols visíveis
       listaIdolsCheckbox.forEach(cb => {
-        cb.checked = checkboxGrupo.checked;
+        if (cb.parentElement.style.display !== "none") {
+          cb.checked = checkboxGrupo.checked;
+        }
       });
       checkboxGrupo.indeterminate = false;
     });
     container.appendChild(divGrupo);
   }
+  aplicarFiltroVisual();
 }
 
 //f:renderizarProdutores
 function renderizarProdutores() {
   const container = document.getElementById("producerContainer");
   container.innerHTML = "";
-  producers.forEach(p => {
+  getProducers().forEach(p => {
     let div = document.createElement("div");
     let cb = document.createElement("input");
     cb.type = "checkbox";
@@ -284,7 +298,7 @@ function renderizarProdutores() {
 function renderizarMusicas() {
   const container = document.getElementById("musicContainer");
   container.innerHTML = "";
-  musics.forEach(m => {
+  getMusics().forEach(m => {
     let div = document.createElement("div");
     let cb = document.createElement("input");
     cb.type = "checkbox";
@@ -298,29 +312,69 @@ function renderizarMusicas() {
   });
 }
 
-//f:aplicarFiltroGeracao
-function aplicarFiltroGeracao() {
-  const gen4Checked = document.getElementById("gen4Filter")?.checked || false;
-  const gen5Checked = document.getElementById("gen5Filter")?.checked || false;
-  filtroGeracao.gen4 = gen4Checked;
-  filtroGeracao.gen5 = gen5Checked;  
-  renderizarGrupos();
+//f:setFiltro
+function setFiltro(tipo, valor) {
+  filtroAtivo[tipo] = valor;
+  // atualizar visual das pills
+  document.querySelectorAll(`.filter-pill[data-filter="${tipo}"]`).forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.value === valor);
+  });
+  aplicarFiltroVisual();
+}
+
+//f:aplicarFiltroVisual
+function aplicarFiltroVisual() {
+  const { gen, letra } = filtroAtivo;
+  const grupos = document.querySelectorAll("#groupsContainer > div");
+  grupos.forEach(grupoDiv => {
+    const nomeGrupo = (grupoDiv.dataset.grupo || "").toUpperCase();
+    const primeiraLetraGrupo = nomeGrupo.charAt(0);
+    // filtro de letra — apenas pelo nome do grupo
+    let grupoPassaLetra = true;
+    if (letra !== "all") {
+      if (letra === "09") {
+        grupoPassaLetra = /[0-9@#]/.test(primeiraLetraGrupo);
+      } else {
+        grupoPassaLetra = primeiraLetraGrupo === letra;
+      }
+    }
+    if (!grupoPassaLetra) {
+      grupoDiv.style.display = "none";
+      return;
+    }
+    const idolDivs = grupoDiv.querySelectorAll("div[data-gen]");
+    let algumIdolVisivel = false;
+    idolDivs.forEach(divIdol => {
+      const idolGen = divIdol.dataset.gen || "";
+      const passaGen = gen === "all" || idolGen === gen;
+      divIdol.style.display = passaGen ? "" : "none";
+      if (passaGen) algumIdolVisivel = true;
+    });
+    // esconde o bloco inteiro do grupo se nenhum idol passa no filtro de geração
+    grupoDiv.style.display = algumIdolVisivel ? "" : "none";
+  });
 }
 
 //f:marcarTodosGeracoes
 function marcarTodosGeracoes() {
-  const checkboxes = document.querySelectorAll("#groupsContainer input[type='checkbox'][value]");
-  checkboxes.forEach(cb => {
-    cb.checked = true;
+  document.querySelectorAll("#groupsContainer input[type='checkbox'][value]").forEach(cb => {
+    const divIdol = cb.parentElement;
+    const divGrupo = divIdol?.parentElement;
+    if (divIdol?.style.display !== "none" && divGrupo?.style.display !== "none") {
+      cb.checked = true;
+    }
   });
   atualizarCheckboxesGrupo();
 }
 
 //f:desmarcarTodosGeracoes
 function desmarcarTodosGeracoes() {
-  const checkboxes = document.querySelectorAll("#groupsContainer input[type='checkbox'][value]");
-  checkboxes.forEach(cb => {
-    cb.checked = false;
+  document.querySelectorAll("#groupsContainer input[type='checkbox'][value]").forEach(cb => {
+    const divIdol = cb.parentElement;
+    const divGrupo = divIdol?.parentElement;
+    if (divIdol?.style.display !== "none" && divGrupo?.style.display !== "none") {
+      cb.checked = false;
+    }
   });
   atualizarCheckboxesGrupo();
 }
@@ -359,7 +413,7 @@ function pegarIdolsSelecionados() {
   const checkboxes = document.querySelectorAll("#groupsContainer input[type='checkbox']");
   checkboxes.forEach(cb => {
     if (cb.checked && cb.value) {
-      let idol = idols.find(i => i.id === cb.value);
+      let idol = getIdols().find(i => i.id === cb.value);
       if (idol) selecionados.push(idol);
     }
   });
@@ -371,7 +425,7 @@ function pegarMusicasSelecionadas() {
   let selecionados = [];
   document.querySelectorAll("#musicContainer input[type='checkbox']").forEach(cb => {
     if (cb.checked && cb.value) {
-      let music = musics.find(m => m.name === cb.value);
+      let music = getMusics().find(m => m.name === cb.value);
       if (music) selecionados.push(music);
     }
   });
@@ -383,7 +437,7 @@ function pegarProdutoresSelecionados() {
   let selecionados = [];
   document.querySelectorAll("#producerContainer input[type='checkbox']").forEach(cb => {
     if (cb.checked && cb.value) {
-      let producer = producers.find(p => p.name === cb.value);
+      let producer = getProducers().find(p => p.name === cb.value);
       if (producer) selecionados.push(producer);
     }
   });
@@ -486,7 +540,146 @@ function iniciarDraft() {
   window.location.href = draftgameHref;
 }
 
-//inicializar
+// ========================
+// IMPORTAÇÃO DE DATABASE
+// ========================
+
+//f:parseCSVLine (suporta aspas corretamente)
+function parseCSVLine(line) {
+  const result = [];
+  let current = "";
+  let insideQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"') { insideQuotes = !insideQuotes; continue; }
+    if (char === ',' && !insideQuotes) { result.push(current.trim()); current = ""; }
+    else { current += char; }
+  }
+  result.push(current.trim());
+  return result;
+}
+
+//f:normalizarChave
+function normalizarChave(chave) {
+  return chave.toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "");
+}
+
+//f:parseArrayDB (usa "/" como separador interno)
+function parseArrayDB(valor) {
+  if (!valor) return [];
+  return valor.split("/").map(v => v.trim()).filter(Boolean);
+}
+
+//f:csvParaObjetos
+function csvParaObjetos(texto) {
+  const linhas = texto.trim().split("\n");
+  const headers = parseCSVLine(linhas[0]).map(h => normalizarChave(h));
+  const resultado = [];
+  for (let i = 1; i < linhas.length; i++) {
+    if (!linhas[i].trim()) continue;
+    const valores = parseCSVLine(linhas[i]);
+    let obj = {};
+    headers.forEach((h, idx) => { obj[h] = valores[idx] || ""; });
+    resultado.push(obj);
+  }
+  return resultado;
+}
+
+//f:normalizarObjeto — detecta tipo e normaliza campos
+function normalizarObjeto(obj) {
+  const tipo = (obj.tipo || obj.type || "").toLowerCase();
+  if (tipo === "idol") {
+    return {
+      gen: obj.geracao || obj.gen || "",
+      type: "idol",
+      id: obj.id || "",
+      name: obj.nome || obj.name || "",
+      group: obj.grupo || obj.group || "",
+      vocal: obj.vocal || "",
+      dance: obj.dance || "",
+      rap: obj.rap || "",
+      center: obj.center || "",
+      visual: obj.visual || "",
+      especialidade: obj.especialidade || "",
+      conceito: parseArrayDB(obj.conceitospredominantes || (Array.isArray(obj.conceito) ? obj.conceito.join("/") : obj.conceito) || ""),
+      generos: parseArrayDB(obj.generospredominantes || (Array.isArray(obj.generos) ? obj.generos.join("/") : obj.generos) || ""),
+      fortes: obj.pontosfortes || obj.fortes || "",
+      fracos: obj.pontosfracos || obj.fracos || ""
+    };
+  }
+  if (tipo === "music" || tipo === "musica" || tipo === "música") {
+    return {
+      type: "music",
+      id: obj.id || "",
+      name: obj.nome || obj.name || "",
+      fonte: obj.fonte || "",
+      conceitos: parseArrayDB(obj.conceitosoriginais || (Array.isArray(obj.conceitos) ? obj.conceitos.join("/") : obj.conceitos) || ""),
+      generos: parseArrayDB(obj.generosoriginais || (Array.isArray(obj.generos) ? obj.generos.join("/") : obj.generos) || "")
+    };
+  }
+  if (tipo === "producer" || tipo === "produtor") {
+    return {
+      type: "producer",
+      id: obj.id || "",
+      name: obj.nome || obj.name || "",
+      conceito: parseArrayDB(obj.conceitospredominantes || (Array.isArray(obj.conceito) ? obj.conceito.join("/") : obj.conceito) || ""),
+      generos: parseArrayDB(obj.generospredominantes || (Array.isArray(obj.generos) ? obj.generos.join("/") : obj.generos) || ""),
+      musicas: obj.musicasconhecidas || obj.musicas || ""
+    };
+  }
+  return null;
+}
+
+//f:importarDatabase
+function importarDatabase(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const ext = file.name.split(".").pop().toLowerCase();
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    let objetos = [];
+    try {
+      if (ext === "json") {
+        const parsed = JSON.parse(e.target.result);
+        objetos = Array.isArray(parsed) ? parsed : [];
+      } else if (ext === "csv") {
+        objetos = csvParaObjetos(e.target.result);
+      } else {
+        alert("Formato não suportado. Use .json ou .csv");
+        return;
+      }
+    } catch(err) {
+      alert("Erro ao ler o arquivo: " + err.message);
+      return;
+    }
+    let countIdols = 0, countMusics = 0, countProducers = 0, countIgnored = 0;
+    objetos.forEach(obj => {
+      const norm = normalizarObjeto(obj);
+      if (!norm) { countIgnored++; return; }
+      if (norm.type === "idol")     { extraIdols.push(norm);     countIdols++;     }
+      else if (norm.type === "music")    { extraMusics.push(norm);    countMusics++;    }
+      else if (norm.type === "producer") { extraProducers.push(norm); countProducers++; }
+    });
+    // re-renderizar tudo
+    renderizarGrupos();
+    renderizarMusicas();
+    renderizarProdutores();
+    // resetar o input para permitir reimportar o mesmo arquivo
+    event.target.value = "";
+    const resumo = [
+      countIdols     > 0 ? `${countIdols} idol(s)`     : null,
+      countMusics    > 0 ? `${countMusics} música(s)`  : null,
+      countProducers > 0 ? `${countProducers} produtor(es)` : null,
+      countIgnored   > 0 ? `${countIgnored} ignorado(s) (tipo desconhecido)` : null,
+    ].filter(Boolean).join(", ");
+    alert(`Database importada com sucesso!\n${resumo || "Nenhum item reconhecido."}`);
+  };
+  reader.readAsText(file);
+}
+
+
 window.addEventListener("load", () => {
   injectHeader();
   initDraftWarning();
