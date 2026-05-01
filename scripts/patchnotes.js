@@ -6,6 +6,28 @@
 // ========================
 const PATCHES = [
   {
+    version: "v0.4.2",
+    title: "Filtros e Importação de Database Volátil",
+    date: "2025-05-01",
+    type: "minor",
+    sections: [
+      {
+        type: "new",
+        label: "Novo",
+        items: [
+          "Implementada a importação de database volátil, agora os jogadores podem inserir seus próprios grupos personalizados via arquivo .csv (Excel).",
+        ]
+      },
+      {
+        type: "fix",
+        label: "Correções",
+        items: [
+          "O filtro em configuração agora suporta seleção por geração (4ª e 5ª) e por grupo, permitindo uma personalização mais granular do pool de idols para o draft.",
+        ]
+      }
+    ]
+  },
+  {
     version: "v0.4.1",
     title: "Nova Identidade Visual e Validações",
     date: "2025-04-28",
