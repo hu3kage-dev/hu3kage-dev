@@ -2,8 +2,8 @@
 // HEADER GLOBAL
 // ========================
 
-//f:getBaseHref
-function getBaseHref() {
+//f:pegarHref
+function pegarHref() {
   const path = location.pathname;
   return path.includes('/screens/') ? '../' : './';
 }
@@ -13,9 +13,9 @@ const NAV_LINKS = [
   { label: "Patch Notes",   href: "patchnotes.html" },
 ];
 
-//f:getNavLink
-function getNavLink(href) {
-  const base = getBaseHref();
+//f:pegarNavLink
+function pegarNavLink(href) {
+  const base = pegarHref();
   const isScreensPage = location.pathname.includes('/screens/');
   const screenPages = ["draftconfig.html", "patchnotes.html"];
   if (isScreensPage) {
@@ -30,8 +30,8 @@ function getNavLink(href) {
   return href;
 }
 
-//f:getGamePageHref
-function getGamePageHref(pageName) {
+//f:pegarHrefJogo
+function pegarHrefJogo(pageName) {
   const isScreensPage = location.pathname.includes('/screens/');
   if (isScreensPage) {
     return pageName;
@@ -39,13 +39,13 @@ function getGamePageHref(pageName) {
   return `screens/${pageName}`;
 }
 
-//f:injectHeader
-function injectHeader() {
+//f:injetarHeader
+function injetarHeader() {
   const currentPage = location.pathname.split("/").pop() || "index.html";
   const header = document.createElement("header");
   header.className = "site-header";
   header.innerHTML = `
-      <a href="${getNavLink("index.html")}" class="header-logo">
+      <a href="${pegarNavLink("index.html")}" class="header-logo">
         <div>
           <div class="header-logo-text">STRAY7</div>
           <div class="header-logo-sub">K-Pop Games</div>
@@ -53,7 +53,7 @@ function injectHeader() {
       </a>
       <nav class="header-nav">
       ${NAV_LINKS.map(link => {
-        const navHref = getNavLink(link.href);
+        const navHref = pegarNavLink(link.href);
         const ativo = link.href === currentPage ? "active" : "";
         return `<a href="${navHref}" class="${ativo}">${link.label}</a>`;
       }).join("")}
@@ -173,8 +173,8 @@ function desmarcarTodasMusicas() {
 // AVISOS
 // ======================== 
 
-//f:initDraftWarning
-function initDraftWarning() {
+//f:iniciarAvisoDraft
+function iniciarAvisoDraft() {
   const button = document.querySelector(".btn-iniciar-draft");
   if (!button) return;
   draftWarningContainer = document.createElement("div");
@@ -190,8 +190,8 @@ function initDraftWarning() {
   button.insertAdjacentElement("beforebegin", draftWarningContainer);
 }
 
-//f:setDraftWarning
-function setDraftWarning(messages) {
+//f:draftAviso
+function draftAviso(messages) {
   if (!draftWarningContainer) return;
   if (!messages || messages.length === 0) {
     draftWarningContainer.style.display = "none";
@@ -503,15 +503,16 @@ function iniciarDraft() {
     errors.push("Informe pelo menos um jogador para iniciar o draft.");
   }
   if (errors.length > 0) {
-    setDraftWarning(errors);
+    draftAviso(errors);
     return;
   }
-  setDraftWarning([]);
+  draftAviso([]);
   let usarMusica = musicasSelecionadas.length > 0;
   let usarProdutor = produtoresSelecionados.length > 0;
   let pool = [];
-  //idols
-  pool = pool.concat(sortearIdols(selecionados, totalIdols));
+  //idols — forçar type explicitamente antes de entrar no pool
+  const idolsComType = sortearIdols(selecionados, totalIdols).map(i => ({ ...i, type: i.type || "Idol" }));
+  pool = pool.concat(idolsComType);
   //music
   if (usarMusica) {
     let musicas = sortearIdols(musicasSelecionadas, jogadores.length);
@@ -524,10 +525,10 @@ function iniciarDraft() {
     produtores.forEach(p => p.type = "producer");
     pool = pool.concat(produtores);
   }
-  //garantir idol type
+  //garantir que idols têm type antes de salvar
   pool = pool.map(item => ({
     ...item,
-    type: item.type || "idol"
+    type: item.type && item.type !== "" ? item.type : "Idol"
   }));
   localStorage.setItem("draftData", JSON.stringify({
     jogadores,
@@ -587,7 +588,7 @@ function csvParaObjetos(texto) {
   return resultado;
 }
 
-//f:normalizarObjeto — detecta tipo e normaliza campos
+//f:normalizarObjeto
 function normalizarObjeto(obj) {
   const tipo = (obj.tipo || obj.type || "").toLowerCase();
   if (tipo === "idol") {
@@ -680,12 +681,176 @@ function importarDatabase(event) {
 }
 
 
+// ========================
+// IMPORTAR DRAFT (.TXT)
+// ========================
+
+//f:importarDraftTxt
+function importarDraftTxt(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (!file.name.endsWith(".txt")) { alert("Use um arquivo .txt exportado pelo Stray7."); return; }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const texto = e.target.result.replace(/\r/g, "");
+    // extrair jogadores e integrantes
+    const jogadores = [];
+    let integrantes = 0;
+    const blocoJogadores = texto.match(/--- JOGADORES[\s\S]*?(?=\n---|$)/);
+    if (blocoJogadores) {
+      blocoJogadores[0].split("\n").forEach(linha => {
+        const matchJog = linha.match(/^\s+\d+\.\s+(.+)$/);
+        if (matchJog) jogadores.push(matchJog[1].trim());
+        const matchInt = linha.match(/Integrantes por time:\s*(\d+)/);
+        if (matchInt) integrantes = parseInt(matchInt[1]);
+      });
+    }
+
+    // extrair objetos do pool a partir das databases disponíveis 
+    const nomesIdols      = extrairNomesBloco(texto, "POOL DE IDOLS",     /^\s+\[.+?\]\s+(.+?)\s{2}/);
+    const nomesMusicas    = extrairNomesBloco(texto, "POOL DE MÚSICAS",    /^\s+(.+?)(?:\s{2}|$)/);
+    const nomesProdutores = extrairNomesBloco(texto, "POOL DE PRODUTORES", /^\s+(.+?)(?:\s{2}|$)/);
+
+    const poolIdols     = nomesIdols.map(nome      => getIdols().find(i => i.name === nome)).filter(Boolean).map(i => ({ ...i, type: "Idol" }));
+    const poolMusicas   = nomesMusicas.map(nome    => getMusics().find(m => m.name === nome)).filter(Boolean).map(m => ({ ...m, type: "music" }));
+    const poolProdutores= nomesProdutores.map(nome => getProducers().find(p => p.name === nome)).filter(Boolean).map(p => ({ ...p, type: "producer" }));
+
+    const pool = [...poolIdols, ...poolMusicas, ...poolProdutores];
+
+    if (jogadores.length === 0 || integrantes === 0) {
+      alert("Arquivo inválido ou incompleto. Verifique se foi exportado pelo Stray7.");
+      event.target.value = "";
+      return;
+    }
+    // desmarcar tudo e marcar só o que estava na pool
+    desmarcarTodosGeracoes();
+    desmarcarTodasMusicas();
+    desmarcarTodosProdutores();
+
+    document.querySelectorAll("#groupsContainer input[type='checkbox'][value]").forEach(cb => {
+      if (poolIdols.some(i => i.id === cb.value)) cb.checked = true;
+    });
+    atualizarCheckboxesGrupo();
+    document.querySelectorAll("#musicContainer input[type='checkbox']").forEach(cb => {
+      if (poolMusicas.some(m => m.name === cb.value)) cb.checked = true;
+    });
+    document.querySelectorAll("#producerContainer input[type='checkbox']").forEach(cb => {
+      if (poolProdutores.some(p => p.name === cb.value)) cb.checked = true;
+    });
+
+    // salvar no localStorage e redirecionar direto para o jogo
+    localStorage.setItem("draftData", JSON.stringify({
+      jogadores,
+      integrantes,
+      pool,
+      usarMusica:   poolMusicas.length > 0,
+      usarProdutor: poolProdutores.length > 0
+    }));
+
+    event.target.value = "";
+
+    const ausentes = nomesIdols.length - poolIdols.length
+                   + nomesMusicas.length - poolMusicas.length
+                   + nomesProdutores.length - poolProdutores.length;
+
+    if (ausentes > 0) {
+      alert(`Atenção: ${ausentes} item(s) da pool original não foram encontrados na database atual e foram ignorados.\n\nO draft será iniciado com os itens disponíveis.`);
+    }
+
+    window.location.href = pegarHrefJogo("draftgame.html");
+  };
+  reader.readAsText(file);
+}
+
+//f:extrairNomesBloco
+function extrairNomesBloco(texto, titulo, regex) {
+  const nomes = [];
+  const escapado = titulo.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const match = texto.match(new RegExp(`--- ${escapado} ---([\\s\\S]*?)(?=\\n---|$)`));
+  if (!match) return nomes;
+  match[1].split("\n").forEach(linha => {
+    if (linha.trim() === "" || linha.trim() === "(nenhum)") return;
+    const m = linha.match(regex);
+    if (m) nomes.push(m[1].trim());
+  });
+  return nomes;
+}
+
+// ========================
+// EXPORTAR DRAFT
+// ========================
+
+//f:injectBotaoExportar
+function injetarBotaoExportar() {
+  const btn = document.createElement("button");
+  btn.id = "btnExportarDraft";
+  btn.textContent = "⬇ Exportar Draft";
+  btn.onclick = exportarDraft;
+  document.getElementById("turnActions").appendChild(btn);
+}
+
+//f:exportarDraft
+function exportarDraft() {
+  const raw = localStorage.getItem("draftData");
+  if (!raw) { alert("Nenhum dado de draft encontrado."); return; }
+  const { jogadores, integrantes, pool } = JSON.parse(raw);
+
+  const tipoLabel = { idol: "Idol", music: "Música", producer: "Produtor" };
+
+  const idols     = pool.filter(i => i.type?.toLowerCase() === "idol");
+  const musicas   = pool.filter(i => i.type?.toLowerCase() === "music");
+  const produtores= pool.filter(i => i.type?.toLowerCase() === "producer");
+
+  const linhas = [];
+
+  linhas.push("=== STRAY7 DRAFT ===");
+  linhas.push(`Data: ${new Date().toLocaleString("pt-BR")}`);
+  linhas.push("");
+
+  linhas.push("--- JOGADORES (ordem do draft) ---");
+  jogadores.forEach((nome, i) => linhas.push(`  ${i + 1}. ${nome}`));
+  linhas.push(`  Integrantes por time: ${integrantes}`);
+  linhas.push("");
+
+  linhas.push("--- POOL DE IDOLS ---");
+  if (idols.length === 0) {
+    linhas.push("  (nenhum)");
+  } else {
+    idols.forEach(idol => {
+      linhas.push(`  [${idol.group}] ${idol.name}  (Gen ${idol.gen || "?"} | Esp: ${idol.especialidade || "-"})`);
+    });
+  }
+  linhas.push("");
+
+  if (musicas.length > 0) {
+    linhas.push("--- POOL DE MÚSICAS ---");
+    musicas.forEach(m => linhas.push(`  ${m.name}${m.fonte ? "  (Fonte: " + m.fonte + ")" : ""}`));
+    linhas.push("");
+  }
+
+  if (produtores.length > 0) {
+    linhas.push("--- POOL DE PRODUTORES ---");
+    produtores.forEach(p => linhas.push(`  ${p.name}`));
+    linhas.push("");
+  }
+
+  const texto = linhas.join("\n");
+  const blob = new Blob([texto], { type: "text/plain;charset=utf-8" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = `stray7_draft_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+//f:render onLoad
 window.addEventListener("load", () => {
-  injectHeader();
+  injetarHeader();
   if (document.getElementById("groupsContainer"))   renderizarGrupos();
   if (document.getElementById("producerContainer")) renderizarProdutores();
   if (document.getElementById("musicContainer"))    renderizarMusicas();
-  if (document.querySelector(".btn-iniciar-draft")) initDraftWarning();
+  if (document.querySelector(".btn-iniciar-draft")) iniciarAvisoDraft();
+  if (document.getElementById("turnActions"))       injetarBotaoExportar();
 });
-
-//tá lendo isso por quê, curioso?

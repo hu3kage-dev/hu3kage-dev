@@ -15,6 +15,7 @@ const PATCHES = [
         type: "new",
         label: "Novo",
         items: [
+          "Implementada a importação de lobby, agora os jogadores podem inserir o mesmo sorteio em computadores diferentes ou compartilhar seus sorteios com amigos via arquivo .txt (a importação de database volátil não funciona com este recurso).",
           "Implementada a importação de database volátil, agora os jogadores podem inserir seus próprios grupos personalizados via arquivo .csv (Excel).",
         ]
       },
