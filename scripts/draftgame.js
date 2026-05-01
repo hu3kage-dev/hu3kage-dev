@@ -750,6 +750,7 @@ function abrirModal(item) {
     return text.toString().replace(/"{3}/g, '"').replace(/^['"]|['"]$/g, "").trim();
   };
   let bodyContent = "";
+  //idol
   if (itemType === "idol") {
     bodyContent = `
     <p><b>Grupo:</b> ${cleanText(item.group)}</p>
@@ -758,19 +759,24 @@ function abrirModal(item) {
     <p><b>Rap:</b> ${cleanText(item.rap)}</p>
     <p><b>Center:</b> ${cleanText(item.center)}</p>
     <p><b>Visual:</b> ${cleanText(item.visual)}</p>
-    <p><b>Conceito Predominante:</b> ${cleanText(item.conceito)}</p>
+    <p><b>Conceitos Predominantes:</b> ${cleanText(item.conceitos)}</p>
+    <p><b>Gêneros Predominantes:</b> ${cleanText(item.generos)}</p>
     <p><b>Pontos Fortes:</b> ${cleanText(item.fortes)}</p>
     <p><b>Pontos Fracos:</b> ${cleanText(item.fracos)}</p>
     `;
+    //music
   } else if (itemType === "music") {
     bodyContent = `
     <p><b>Fonte:</b> ${cleanText(item.fonte)}</p>
-    <p><b>Conceito Original:</b> ${cleanText(item.conceito)}</p>
+    <p><b>Conceitos Originais:</b> ${cleanText(item.conceitos)}</p>
+    <p><b>Gêneros Originais:</b> ${cleanText(item.generos)}</p>
     `;
+    //producer
   } else if (itemType === "producer") {
     bodyContent = `
-    <p><b>Conceito Predominante:</b> ${cleanText(item.conceito)}</p>
-    <p><b>Outros Conceitos:</b> ${cleanText(item.outrosconceitos)}</p>
+    <p><b>Conceitos Predominantes:</b> ${cleanText(item.conceitos)}</p>
+    <p><b>Gêneros Predominantes:</b> ${cleanText(item.generos)}</p>
+    <p><b>Músicas Conhecidas:</b> ${cleanText(item.musicas)}</p>
     `;
   } else {
     bodyContent = `<p><b>Tipo:</b> ${itemType}</p>`;
@@ -827,11 +833,21 @@ function verificarFimDoJogo() {
 
 //f:encerrarDraft
 function encerrarDraft() {
+  const pickOrder = {};
+  jogadores.forEach((_, pi) => { pickOrder[pi] = []; });
+  ordem.forEach(pi => {
+    const p = picks[pi];
+    if (!p) return;
+    ["idol","music","producer"].forEach(tipo => {
+      (p[tipo] || []).forEach(c => { if (c && !pickOrder[pi].find(x => x.id === c.id)) pickOrder[pi].push(c); });
+    });
+  });
   mostrarAviso("🎉 Draft Encerrado! Todos os boards foram preenchidos com sucesso!");
   localStorage.setItem("simulacaoData", JSON.stringify({
     jogadores,
     ordem: ordem.slice(0, jogadores.length),
     picks,
+    pickOrder,
     config: window.config
   }));
   const btn = document.querySelector("#gameScreen button");
