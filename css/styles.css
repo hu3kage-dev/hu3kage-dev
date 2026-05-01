@@ -598,6 +598,24 @@ body::before {
   color: #d8b4fe;
 }
 
+#btnExportarDraft {
+  background: rgba(168,85,247,0.15);
+  border: 1px solid rgba(168,85,247,0.4);
+  color: #d4b4ff;
+  font-size: 11px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  margin: 0;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+#btnExportarDraft:hover {
+  background: rgba(168,85,247,0.28);
+  border-color: rgba(168,85,247,0.7);
+  color: #f0e6ff;
+}
+
 #turnActions {
   display: flex;
   flex-wrap: wrap;
@@ -655,25 +673,6 @@ body::before {
   flex-wrap: wrap;
   gap: 12px;
   justify-content: flex-start;
-}
-
-/* Botão exportar draft (draftgame) */
-#btnExportarDraft {
-  background: rgba(168,85,247,0.15);
-  border: 1px solid rgba(168,85,247,0.4);
-  color: #d4b4ff;
-  font-size: 13px;
-  padding: 8px 18px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
-  margin: 0;
-}
-
-#btnExportarDraft:hover {
-  background: rgba(168,85,247,0.28);
-  border-color: rgba(168,85,247,0.7);
-  color: #f0e6ff;
 }
 
 
