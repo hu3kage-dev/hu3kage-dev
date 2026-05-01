@@ -682,10 +682,10 @@ function importarDatabase(event) {
 
 window.addEventListener("load", () => {
   injectHeader();
-  initDraftWarning();
-  renderizarGrupos();
-  renderizarProdutores();
-  renderizarMusicas();
+  if (document.getElementById("groupsContainer"))   renderizarGrupos();
+  if (document.getElementById("producerContainer")) renderizarProdutores();
+  if (document.getElementById("musicContainer"))    renderizarMusicas();
+  if (document.querySelector(".btn-iniciar-draft")) initDraftWarning();
 });
 
 //tá lendo isso por quê, curioso?
