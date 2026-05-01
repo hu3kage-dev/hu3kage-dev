@@ -94,7 +94,7 @@ function getProducers() { return [...producers,  ...extraProducers]; }
 
 //f:irParaDraft
 function irParaDraft() {
-  const draftHref = getNavLink("draftconfig.html");
+  const draftHref = pegarNavLink("draftconfig.html");
   window.location.href = draftHref;
 }
 
@@ -537,7 +537,7 @@ function iniciarDraft() {
     usarMusica,
     usarProdutor
   }));
-  const draftgameHref = getGamePageHref("draftgame.html");
+  const draftgameHref = pegarHrefJogo("draftgame.html");
   window.location.href = draftgameHref;
 }
 
