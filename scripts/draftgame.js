@@ -840,7 +840,7 @@ function encerrarDraft() {
     btn.style.backgroundColor = "#7e22ce";
     btn.style.border = "2px solid yellow";
     btn.onclick = () => { 
-      const simulacaoHref = getGamePageHref("simulacao.html");
+      const simulacaoHref = pegarHrefJogo("simulacao.html");
       window.location.href = simulacaoHref;
     };
   }
