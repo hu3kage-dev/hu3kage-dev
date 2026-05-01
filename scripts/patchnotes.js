@@ -253,7 +253,7 @@ function renderPatchNotes() {
 // INIT
 // ========================
 document.addEventListener("DOMContentLoaded", () => {
-  injectHeader();
+  injetarHeader();
   const isPatchPage = location.pathname.includes("patchnotes");
   if (isPatchPage) renderPatchNotes();
 });
