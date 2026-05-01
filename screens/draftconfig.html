@@ -27,8 +27,8 @@
       <li>O pool (conjunto de itens disponíveis para seleção) é limitado ao número de jogadores para que a escolha de um jogador ativamente atrapalhe e influencie a escolha dos demais.</li>
       <li>O formato do draft é em turnos, onde cada jogador escolhe um idol, música ou produtor por turno.</li>
       <li>A ordem de escolha é em formato de cobrinha (Snake Draft), onde o primeiro jogador escolhe um item e os demais seguem em ordem. Quando o último jogador termina sua vez, a ordem é invertida e ele escolhe de novo. O mesmo acontece ao retornar para o primeiro jogador.</li>
-      <li>Cada idol possui atributos únicos, especialidades, conceitos predominantes, pontos fortes e fracos.</li>
-      <li>Cada produtor possui conceitos predominantes, e outros conceitos. Isto influencia na regra abaixo.</li>
+      <li>Cada idol possui atributos únicos, especialidades, conceitos predominantes, gêneros predominantes, pontos fortes e fracos.</li>
+      <li>Cada produtor possui conceitos predominantes e gêneros predominantes. Isto influencia na regra abaixo.</li>
       <li>Caso o gênero da música não combine com a sua formação de grupo, você pode tentar mudar o gênero, porém a chance de sucesso depende dos atributos dos idols e produtores escolhidos.</li>
       <li>O objetivo é criar o melhor time possível com as variáveis disponíveis.</li>
       <li>Este jogo ainda está em desenvolvimento, e os atributos não representam os valores reais das capacidades de um idol.</li>
@@ -65,12 +65,62 @@
 
     <div class="config-block block-3">
       <h3>Seleção de Idols e Grupos</h3>
-      <div id="generationFilter" style="margin-bottom: 15px; padding: 10px; background: #333; border: 1px solid #555; border-radius: 5px;">
-        <label style="font-weight: bold; margin-right: 15px; color: #fff;">Filtrar por Geração:</label>
-        <input type="checkbox" id="gen4Filter" checked onchange="aplicarFiltroGeracao()"> <label for="gen4Filter" style="color: #fff;">4ª Geração</label>
-        <input type="checkbox" id="gen5Filter" checked onchange="aplicarFiltroGeracao()" style="margin-left: 15px;"> <label for="gen5Filter" style="color: #fff;">5ª Geração</label>
-        <button onclick="marcarTodosGeracoes()" style="margin-left: 20px;">Marcar Todos</button>
-        <button onclick="desmarcarTodosGeracoes()">Desmarcar Todos</button>
+      <div id="idolFilter">
+        <div class="idol-filter-row">
+          <span class="idol-filter-label">Geração:</span>
+          <div class="idol-filter-pills" id="filterGen">
+            <button class="filter-pill active" data-filter="gen" data-value="all" onclick="setFiltro('gen','all')">Todas</button>
+            <button class="filter-pill" data-filter="gen" data-value="1" onclick="setFiltro('gen','1')">1ª</button>
+            <button class="filter-pill" data-filter="gen" data-value="2" onclick="setFiltro('gen','2')">2ª</button>
+            <button class="filter-pill" data-filter="gen" data-value="3" onclick="setFiltro('gen','3')">3ª</button>
+            <button class="filter-pill" data-filter="gen" data-value="4" onclick="setFiltro('gen','4')">4ª</button>
+            <button class="filter-pill" data-filter="gen" data-value="5" onclick="setFiltro('gen','5')">5ª</button>
+          </div>
+        </div>
+        <div class="idol-filter-row">
+          <span class="idol-filter-label">Grupo:</span>
+          <div class="idol-filter-pills" id="filterLetra">
+            <button class="filter-pill active" data-filter="letra" data-value="all" onclick="setFiltro('letra','all')">Todos</button>
+            <button class="filter-pill" data-filter="letra" data-value="09" onclick="setFiltro('letra','09')">0–9 @ #</button>
+            <button class="filter-pill" data-filter="letra" data-value="A" onclick="setFiltro('letra','A')">A</button>
+            <button class="filter-pill" data-filter="letra" data-value="B" onclick="setFiltro('letra','B')">B</button>
+            <button class="filter-pill" data-filter="letra" data-value="C" onclick="setFiltro('letra','C')">C</button>
+            <button class="filter-pill" data-filter="letra" data-value="D" onclick="setFiltro('letra','D')">D</button>
+            <button class="filter-pill" data-filter="letra" data-value="E" onclick="setFiltro('letra','E')">E</button>
+            <button class="filter-pill" data-filter="letra" data-value="F" onclick="setFiltro('letra','F')">F</button>
+            <button class="filter-pill" data-filter="letra" data-value="G" onclick="setFiltro('letra','G')">G</button>
+            <button class="filter-pill" data-filter="letra" data-value="H" onclick="setFiltro('letra','H')">H</button>
+            <button class="filter-pill" data-filter="letra" data-value="I" onclick="setFiltro('letra','I')">I</button>
+            <button class="filter-pill" data-filter="letra" data-value="J" onclick="setFiltro('letra','J')">J</button>
+            <button class="filter-pill" data-filter="letra" data-value="K" onclick="setFiltro('letra','K')">K</button>
+            <button class="filter-pill" data-filter="letra" data-value="L" onclick="setFiltro('letra','L')">L</button>
+            <button class="filter-pill" data-filter="letra" data-value="M" onclick="setFiltro('letra','M')">M</button>
+            <button class="filter-pill" data-filter="letra" data-value="N" onclick="setFiltro('letra','N')">N</button>
+            <button class="filter-pill" data-filter="letra" data-value="O" onclick="setFiltro('letra','O')">O</button>
+            <button class="filter-pill" data-filter="letra" data-value="P" onclick="setFiltro('letra','P')">P</button>
+            <button class="filter-pill" data-filter="letra" data-value="Q" onclick="setFiltro('letra','Q')">Q</button>
+            <button class="filter-pill" data-filter="letra" data-value="R" onclick="setFiltro('letra','R')">R</button>
+            <button class="filter-pill" data-filter="letra" data-value="S" onclick="setFiltro('letra','S')">S</button>
+            <button class="filter-pill" data-filter="letra" data-value="T" onclick="setFiltro('letra','T')">T</button>
+            <button class="filter-pill" data-filter="letra" data-value="U" onclick="setFiltro('letra','U')">U</button>
+            <button class="filter-pill" data-filter="letra" data-value="V" onclick="setFiltro('letra','V')">V</button>
+            <button class="filter-pill" data-filter="letra" data-value="W" onclick="setFiltro('letra','W')">W</button>
+            <button class="filter-pill" data-filter="letra" data-value="X" onclick="setFiltro('letra','X')">X</button>
+            <button class="filter-pill" data-filter="letra" data-value="Y" onclick="setFiltro('letra','Y')">Y</button>
+            <button class="filter-pill" data-filter="letra" data-value="Z" onclick="setFiltro('letra','Z')">Z</button>
+          </div>
+        </div>
+        <div class="idol-filter-row idol-filter-actions">
+          <div class="idol-filter-import">
+            <label class="btn-importar-db" for="importDbInput">⬆ Importar Database</label>
+            <input type="file" id="importDbInput" accept=".csv,.json" onchange="importarDatabase(event)" style="display:none;">
+            <span id="importDbStatus" class="import-db-status"></span>
+          </div>
+          <div class="idol-filter-mark-btns">
+            <button onclick="marcarTodosGeracoes()">Marcar Todos</button>
+            <button onclick="desmarcarTodosGeracoes()">Desmarcar Todos</button>
+          </div>
+        </div>
       </div>
       <div id="groupsContainer" class="scroll-box"></div>
     </div>
