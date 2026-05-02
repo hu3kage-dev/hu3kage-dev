@@ -712,9 +712,17 @@ function importarDraftTxt(event) {
     const nomesMusicas    = extrairNomesBloco(texto, "POOL DE MÚSICAS",    /^\s+(.+?)(?:\s{2}|$)/);
     const nomesProdutores = extrairNomesBloco(texto, "POOL DE PRODUTORES", /^\s+(.+?)(?:\s{2}|$)/);
 
-    const poolIdols     = nomesIdols.map(nome      => getIdols().find(i => i.name === nome)).filter(Boolean).map(i => ({ ...i, type: "Idol" }));
-    const poolMusicas   = nomesMusicas.map(nome    => getMusics().find(m => m.name === nome)).filter(Boolean).map(m => ({ ...m, type: "music" }));
-    const poolProdutores= nomesProdutores.map(nome => getProducers().find(p => p.name === nome)).filter(Boolean).map(p => ({ ...p, type: "producer" }));
+    const poolIdols     = nomesIdols.map(item =>
+      getIdols().find(i => item.id ? i.id === item.id : i.name === item.name)
+    ).filter(Boolean).map(i => ({ ...i, type: "Idol" }));
+
+    const poolMusicas   = nomesMusicas.map(item =>
+      getMusics().find(m => item.id ? m.id === item.id : m.name === item.name)
+    ).filter(Boolean).map(m => ({ ...m, type: "music" }));
+
+    const poolProdutores= nomesProdutores.map(item =>
+      getProducers().find(p => item.id ? p.id === item.id : p.name === item.name)
+    ).filter(Boolean).map(p => ({ ...p, type: "producer" }));
 
     const pool = [...poolIdols, ...poolMusicas, ...poolProdutores];
 
@@ -765,18 +773,19 @@ function importarDraftTxt(event) {
   reader.readAsText(file);
 }
 
-//f:extrairNomesBloco
+//f:extrairNomesBloco — helper para pegar ids/nomes de uma seção do .txt
 function extrairNomesBloco(texto, titulo, regex) {
-  const nomes = [];
+  const itens = [];
   const escapado = titulo.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const match = texto.match(new RegExp(`--- ${escapado} ---([\\s\\S]*?)(?=\\n---|$)`));
-  if (!match) return nomes;
+  if (!match) return itens;
   match[1].split("\n").forEach(linha => {
     if (linha.trim() === "" || linha.trim() === "(nenhum)") return;
+    const idMatch = linha.match(/\{id:([^}]+)\}/);
     const m = linha.match(regex);
-    if (m) nomes.push(m[1].trim());
+    if (m) itens.push({ id: idMatch ? idMatch[1].trim() : null, name: m[1].trim() });
   });
-  return nomes;
+  return itens;
 }
 
 // ========================
@@ -832,20 +841,20 @@ function exportarDraft() {
     linhas.push("  (nenhum)");
   } else {
     idols.forEach(idol => {
-      linhas.push(`  [${idol.group}] ${idol.name}  (Gen ${idol.gen || "?"} | Esp: ${idol.especialidade || "-"})`);
+      linhas.push(`  [${idol.group}] ${idol.name}  {id:${idol.id}}  (Gen ${idol.gen || "?"} | Esp: ${idol.especialidade || "-"})`);
     });
   }
   linhas.push("");
 
   if (musicas.length > 0) {
     linhas.push("--- POOL DE MÚSICAS ---");
-    musicas.forEach(m => linhas.push(`  ${m.name}${m.fonte ? "  (Fonte: " + m.fonte + ")" : ""}`));
+    musicas.forEach(m => linhas.push(`  ${m.name}  {id:${m.id}}${m.fonte ? "  (Fonte: " + m.fonte + ")" : ""}`));
     linhas.push("");
   }
 
   if (produtores.length > 0) {
     linhas.push("--- POOL DE PRODUTORES ---");
-    produtores.forEach(p => linhas.push(`  ${p.name}`));
+    produtores.forEach(p => linhas.push(`  ${p.name}  {id:${p.id}}`));
     linhas.push("");
   }
 
