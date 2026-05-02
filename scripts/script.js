@@ -103,6 +103,17 @@ function modoEmDesenvolvimento() {
   alert("Este modo de jogo ainda está em desenvolvimento.");
 }
 
+//f:render onLoad
+window.addEventListener("load", () => {
+  injetarHeader();
+  if (document.getElementById("groupsContainer"))   renderizarGrupos();
+  if (document.getElementById("producerContainer")) renderizarProdutores();
+  if (document.getElementById("musicContainer"))    renderizarMusicas();
+  if (document.querySelector(".btn-iniciar-draft")) iniciarAvisoDraft();
+  const paginaAtual = location.pathname.split("/").pop();
+  if (paginaAtual === "draftgame.html") injetarBotaoExportar();
+});
+
 // ========================
 // FUNÇÕES DE BLOCOS
 // ========================
@@ -846,14 +857,3 @@ function exportarDraft() {
   a.click();
   URL.revokeObjectURL(url);
 }
-
-//f:render onLoad
-window.addEventListener("load", () => {
-  injetarHeader();
-  if (document.getElementById("groupsContainer"))   renderizarGrupos();
-  if (document.getElementById("producerContainer")) renderizarProdutores();
-  if (document.getElementById("musicContainer"))    renderizarMusicas();
-  if (document.querySelector(".btn-iniciar-draft")) iniciarAvisoDraft();
-  const paginaAtual = location.pathname.split("/").pop();
-  if (paginaAtual === "draftgame.html") injetarBotaoExportar();
-});
