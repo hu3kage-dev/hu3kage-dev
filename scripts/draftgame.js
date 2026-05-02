@@ -773,6 +773,7 @@ function abrirModal(item) {
     <p><b>Rap:</b> ${cleanText(item.rap)}</p>
     <p><b>Center:</b> ${cleanText(item.center)}</p>
     <p><b>Visual:</b> ${cleanText(item.visual)}</p>
+    <p><b>Especialidade:</b> ${cleanText(item.especialidade)}</p>
     <p><b>Conceitos Predominantes:</b> ${cleanText(item.conceitos)}</p>
     <p><b>Gêneros Predominantes:</b> ${cleanText(item.generos)}</p>
     <p><b>Pontos Fortes:</b> ${cleanText(item.fortes)}</p>
