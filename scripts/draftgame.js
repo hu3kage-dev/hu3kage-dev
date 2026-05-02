@@ -44,7 +44,21 @@ window.onload = function () {
     usarProdutor: dados.usarProdutor
   };
   let totalRodadas = dados.integrantes + (dados.usarMusica ? 1 : 0) + (dados.usarProdutor ? 1 : 0);
-  ordem = gerarOrdemCobrinha(jogadores.length, totalRodadas);
+  // Se vier de importação, restaurar ordemBase fixa; senão sortear normalmente
+  if (dados.ordemBase) {
+    const base = dados.ordemBase;
+    ordem = [];
+    for (let i = 0; i < totalRodadas; i++) {
+      ordem = ordem.concat(i % 2 === 0 ? base : [...base].reverse());
+    }
+  } else {
+    ordem = gerarOrdemCobrinha(jogadores.length, totalRodadas);
+    // persistir ordemBase para eventual exportação/re-importação
+    const ordemBase = ordem.slice(0, jogadores.length);
+    const draftAtual = JSON.parse(localStorage.getItem("draftData"));
+    draftAtual.ordemBase = ordemBase;
+    localStorage.setItem("draftData", JSON.stringify(draftAtual));
+  }
   render();
 };
 

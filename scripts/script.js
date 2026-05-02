@@ -103,17 +103,6 @@ function modoEmDesenvolvimento() {
   alert("Este modo de jogo ainda está em desenvolvimento.");
 }
 
-//f:render onLoad
-window.addEventListener("load", () => {
-  injetarHeader();
-  if (document.getElementById("groupsContainer"))   renderizarGrupos();
-  if (document.getElementById("producerContainer")) renderizarProdutores();
-  if (document.getElementById("musicContainer"))    renderizarMusicas();
-  if (document.querySelector(".btn-iniciar-draft")) iniciarAvisoDraft();
-  const paginaAtual = location.pathname.split("/").pop();
-  if (paginaAtual === "draftgame.html") injetarBotaoExportar();
-});
-
 // ========================
 // FUNÇÕES DE BLOCOS
 // ========================
@@ -756,7 +745,9 @@ function importarDraftTxt(event) {
       integrantes,
       pool,
       usarMusica:   poolMusicas.length > 0,
-      usarProdutor: poolProdutores.length > 0
+      usarProdutor: poolProdutores.length > 0,
+      // ordemBase = [0,1,...,n-1] pois jogadores já estão na ordem sorteada
+      ordemBase: jogadores.map((_, i) => i)
     }));
 
     event.target.value = "";
@@ -807,7 +798,17 @@ function injetarBotaoExportar() {
 function exportarDraft() {
   const raw = localStorage.getItem("draftData");
   if (!raw) { alert("Nenhum dado de draft encontrado."); return; }
-  const { jogadores, integrantes, pool } = JSON.parse(raw);
+  const { integrantes, pool } = JSON.parse(raw);
+
+  // ler ordem real do DOM (sorteada pelo draftgame.js)
+  // fallback para localStorage se o board não estiver disponível
+  const playerRows = document.querySelectorAll("#playersBoard .playerRow");
+  let jogadores;
+  if (playerRows.length > 0) {
+    jogadores = Array.from(playerRows).map(row => row.querySelector(".playerName")?.textContent?.trim()).filter(Boolean);
+  } else {
+    jogadores = JSON.parse(raw).jogadores;
+  }
 
   const tipoLabel = { idol: "Idol", music: "Música", producer: "Produtor" };
 
@@ -857,3 +858,14 @@ function exportarDraft() {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+//f:render onLoad
+window.addEventListener("load", () => {
+  injetarHeader();
+  if (document.getElementById("groupsContainer"))   renderizarGrupos();
+  if (document.getElementById("producerContainer")) renderizarProdutores();
+  if (document.getElementById("musicContainer"))    renderizarMusicas();
+  if (document.querySelector(".btn-iniciar-draft")) iniciarAvisoDraft();
+  const paginaAtual = location.pathname.split("/").pop();
+  if (paginaAtual === "draftgame.html") injetarBotaoExportar();
+});
