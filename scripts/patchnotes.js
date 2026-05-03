@@ -6,6 +6,22 @@
 // ========================
 const PATCHES = [
   {
+    version: "v0.4.3",
+    title: "Melhorias na Exibição dos Tutoriais.",
+    date: "2025-05-03",
+    type: "minor",
+    sections: [
+      {
+        type: "new",
+        label: "Novo",
+        items: [
+          "Um tutorial mais completo sobre as regras do jogo foi adicionado em <span class='hl'>Configuração do Draft</span> para garantir que os jogadores entendam as mecânicas básicas antes de iniciar o draft.",
+          "Um tutorial de importação e exportação foi adicionado em <span class='hl'>Configuração do Draft</span> para orientar os jogadores sobre como usar os novos recursos de importação de lobby e database volátil.",
+        ]
+      },
+    ]
+  },
+  {
     version: "v0.4.2",
     title: "Filtros e Importação de Database Volátil",
     date: "2025-05-01",

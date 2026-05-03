@@ -59,7 +59,7 @@ function injetarHeader() {
       }).join("")}
     </nav>
     <div class="header-right">
-      <span class="header-badge">v0.4.0</span>
+      <span class="header-badge">v0.4.3</span>
     </div>
   `;
   document.body.prepend(header);
@@ -160,13 +160,13 @@ function desmarcarTodosProdutores() {
 //f:marcarTodasMusicas
 function marcarTodasMusicas() {
   document.querySelectorAll("#musicContainer input[type='checkbox']")
-    .forEach(cb => cb.checked = true);
+    .forEach(cb => { cb.checked = true; cb.indeterminate = false; });
 }
 
 //f:desmarcarTodasMusicas
 function desmarcarTodasMusicas() {
   document.querySelectorAll("#musicContainer input[type='checkbox']")
-    .forEach(cb => cb.checked = false);
+    .forEach(cb => { cb.checked = false; cb.indeterminate = false; });
 }
 
 // ========================
@@ -298,18 +298,69 @@ function renderizarProdutores() {
 function renderizarMusicas() {
   const container = document.getElementById("musicContainer");
   container.innerHTML = "";
+
+  // agrupar por fonte
+  const porFonte = {};
   getMusics().forEach(m => {
-    let div = document.createElement("div");
-    let cb = document.createElement("input");
-    cb.type = "checkbox";
-    cb.checked = true;
-    cb.value = m.name;
-    let label = document.createElement("label");
-    label.innerText = " " + m.name;
-    div.appendChild(cb);
-    div.appendChild(label);
-    container.appendChild(div);
+    const fonte = m.fonte || "Sem Fonte";
+    if (!porFonte[fonte]) porFonte[fonte] = [];
+    porFonte[fonte].push(m);
   });
+
+  for (const nomeFonte in porFonte) {
+    const musicas = porFonte[nomeFonte];
+
+    const divFonte = document.createElement("div");
+    divFonte.dataset.fonte = nomeFonte;
+
+    // checkbox + label do grupo (fonte)
+    const cbFonte = document.createElement("input");
+    cbFonte.type = "checkbox";
+    cbFonte.checked = true;
+    const labelFonte = document.createElement("label");
+    labelFonte.innerText = " " + nomeFonte;
+    divFonte.appendChild(cbFonte);
+    divFonte.appendChild(labelFonte);
+
+    // checkboxes filhos
+    const listaFilhos = [];
+    musicas.forEach(m => {
+      const divMusica = document.createElement("div");
+      divMusica.style.marginLeft = "15px";
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = true;
+      cb.value = m.name;
+      listaFilhos.push(cb);
+
+      cb.addEventListener("change", () => {
+        const total = listaFilhos.length;
+        const marcados = listaFilhos.filter(c => c.checked).length;
+        if (marcados === total) {
+          cbFonte.checked = true;
+          cbFonte.indeterminate = false;
+        } else if (marcados === 0) {
+          cbFonte.checked = false;
+          cbFonte.indeterminate = false;
+        } else {
+          cbFonte.indeterminate = true;
+        }
+      });
+
+      const label = document.createElement("label");
+      label.innerText = " " + m.name;
+      divMusica.appendChild(cb);
+      divMusica.appendChild(label);
+      divFonte.appendChild(divMusica);
+    });
+
+    cbFonte.addEventListener("change", () => {
+      listaFilhos.forEach(cb => cb.checked = cbFonte.checked);
+      cbFonte.indeterminate = false;
+    });
+
+    container.appendChild(divFonte);
+  }
 }
 
 //f:setFiltro
@@ -682,8 +733,261 @@ function importarDatabase(event) {
 
 
 // ========================
-// IMPORTAR DRAFT (.TXT)
+// MODAL TUTORIAL
 // ========================
+
+const TUTORIAL_HTML = `
+<div class="tut-config-grid">
+  <div class="tut-config-block">
+    <h3>Montagem do Jogo</h3>
+    <ul>
+      <li>Cada jogador monta um time escolhendo idols, músicas e produtores.</li>
+      <li>A quantidade mínima de idols selecionadas deve ser igual ou superior ao número de jogadores multiplicado pelo número de integrantes.</li>
+      <li>Incluir músicas e produtores é opcional.</li>
+      <li>Ao desmarcar todas as músicas e produtores, o draft será realizado apenas com idols.</li>
+      <li>Ao desmarcar todas as músicas, o draft será realizado apenas com idols e produtores.</li>
+      <li>Ao desmarcar todos os produtores, o draft será realizado apenas com idols e músicas.</li>
+      <li>Se decidir incluir músicas e produtores, o número mínimo deve ser igual ou superior ao número de jogadores.</li>
+    </ul>
+  </div>
+  <div class="tut-config-block">
+    <h3>Pool</h3>
+    <ul>
+      <li>O Pool é o conjunto de itens disponíveis para seleção.</li>
+      <li>Em cada turno você pode escolher um item do Pool.</li>
+      <ul><li>Idol, Música ou Produtor</li></ul>
+      <li>Ele é limitado ao número de jogadores, ou seja, existe apenas a quantidade exata que cada um precisa.</li>
+      <li>Isso significa que:</li>
+      <ul>
+        <li>Pegar um item do Pool pode prejudicar diretamente a estratégia de outros jogadores.</li>
+        <li>Cada escolha importa de verdade, não é apenas montagem individual.</li>
+      </ul>
+    </ul>
+  </div>
+  <div class="tut-config-block">
+    <h3>Sistema de Escolha (Snake Draft)</h3>
+    <ul>
+      <li>O draft acontece em turnos e rodadas.</li>
+      <li>Cada rodada inverte a ordem dos turnos.</li>
+      <li>Exemplo com 4 jogadores:</li>
+      <ul>
+        <li>Rodada 1: Jogador 1 → Jogador 2 → Jogador 3 → Jogador 4</li>
+        <li>Rodada 2: Jogador 4 → Jogador 3 → Jogador 2 → Jogador 1</li>
+        <li>Rodada 3: Jogador 1 → Jogador 2 → Jogador 3 → Jogador 4</li>
+        <li>Rodada 4: Jogador 4 → Jogador 3 → Jogador 2 → Jogador 1</li>
+      </ul>
+      <li>Quem escolhe por último, joga duas vezes na mesma rodada.</li>
+    </ul>
+  </div>
+  <div class="tut-config-block">
+    <h3>Atributos e Multiplicadores</h3>
+    <ul>
+      <li>Existem multiplicadores de atributos que afetam a pontuação final do time.</li>
+      <li>É extremamente importante escolher a posição certa para cada idol, assim como combinar conceitos e gêneros entre idols, músicas e produtores.</li>
+      <li>Cada idol possui:</li>
+      <ul>
+        <li>Atributos (Vocal, Dance, Rap, Center, Visual)</li>
+        <li>Especialidade (posição onde mais se destaca)</li>
+        <li>Conceitos Predominantes (conceitos em que mais se destaca)</li>
+        <li>Gêneros Predominantes (gêneros em que mais se destaca)</li>
+      </ul>
+      <li>Cada música possui:</li>
+      <ul>
+        <li>Conceitos Originais</li>
+        <li>Gêneros Originais</li>
+      </ul>
+      <li>Cada produtor possui:</li>
+      <ul>
+        <li>Conceitos Predominantes (conceitos em que mais tem sucesso)</li>
+        <li>Gêneros Predominantes (gêneros em que mais tem sucesso)</li>
+      </ul>
+    </ul>
+  </div>
+  <div class="tut-config-block">
+    <h3>Combinações e Sinergias</h3>
+    <ul>
+      <li>Caso o gênero da música não combine com a sua formação de grupo, você pode tentar mudar o gênero.</li>
+      <li>A chance de sucesso depende da sinergia entre os gêneros dos idols e produtores escolhidos.</li>
+    </ul>
+  </div>
+  <div class="tut-config-block">
+    <h3>Objetivo</h3>
+    <ul>
+      <li>O objetivo é criar o melhor time possível com as variáveis disponíveis.</li>
+      <li>Este jogo ainda está em desenvolvimento, e os atributos não representam os valores reais das capacidades de um idol.</li>
+    </ul>
+  </div>
+</div>`;
+
+//f:abrirTutorial
+function abrirTutorial() {
+  const modal = document.getElementById("modalTutorial");
+  const body  = document.getElementById("modalTutorialBody");
+  if (!modal) return;
+  if (!body.dataset.loaded) {
+    body.innerHTML = TUTORIAL_HTML;
+    body.dataset.loaded = "1";
+  }
+  modal.style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+
+//f:fecharTutorial
+function fecharTutorial() {
+  const modal = document.getElementById("modalTutorial");
+  if (modal) modal.style.display = "none";
+  document.body.style.overflow = "";
+}
+
+//f:fecharTutorialFora
+function fecharTutorialFora(event) {
+  if (event.target === document.getElementById("modalTutorial")) fecharTutorial();
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") { fecharTutorial(); fecharTutorialLobby(); }
+});
+
+// ========================
+// MODAL TUTORIAL LOBBY
+// ========================
+
+const TUTORIAL_LOBBY_HTML = `
+<div class="tut-config-grid">
+
+  <div class="tut-config-block" style="grid-column: 1 / -1">
+    <h3>O que é o Lobby?</h3>
+    <ul>
+      <li>O Lobby é o estado inicial do draft: a <strong>ordem sorteada dos jogadores</strong> e o <strong>pool de itens</strong> (idols, músicas e produtores) selecionados para a partida.</li>
+      <li>Exportar o Lobby salva um arquivo <code>.txt</code> com essas informações, permitindo retomar ou compartilhar exatamente a mesma configuração.</li>
+      <li>Importar o Lobby restaura tudo automaticamente e redireciona para o jogo sem precisar reconfigurar nada.</li>
+    </ul>
+  </div>
+
+  <div class="tut-config-block">
+    <h3>Exportar o Lobby</h3>
+    <ul>
+      <li>Durante o Draft Game, clique em <strong>⬇ Exportar Draft</strong> no canto superior direito do header.</li>
+      <li>Um arquivo <code>stray7_draft_AAAA-MM-DD.txt</code> será baixado automaticamente.</li>
+      <li>O arquivo contém:</li>
+      <ul>
+        <li>A ordem sorteada dos jogadores</li>
+        <li>O número de integrantes por time</li>
+        <li>Todos os idols, músicas e produtores do pool</li>
+      </ul>
+      <li>Cada item do pool inclui seu <code>id</code> interno entre <code>{}</code> — não remova essa parte ao editar o arquivo.</li>
+    </ul>
+  </div>
+
+  <div class="tut-config-block">
+    <h3>Importar o Lobby</h3>
+    <ul>
+      <li>Na página de Configuração do Draft, clique em <strong>⬆ Importar Draft</strong>.</li>
+      <li>Selecione o arquivo <code>.txt</code> exportado anteriormente.</li>
+      <li>O sistema irá:</li>
+      <ul>
+        <li>Preencher automaticamente os nomes e quantidade de jogadores</li>
+        <li>Restaurar o tamanho do grupo</li>
+        <li>Pré-selecionar os checkboxes dos idols, músicas e produtores do pool original</li>
+        <li>Preservar a ordem sorteada — sem novo sorteio</li>
+      </ul>
+      <li>Você será redirecionado ao jogo imediatamente.</li>
+      <li>Se algum item do pool não for encontrado na database atual (ex: veio de uma database importada volatilmente), ele será ignorado e um aviso será exibido.</li>
+    </ul>
+  </div>
+
+  <div class="tut-config-block" style="grid-column: 1 / -1">
+    
+  <h3>Importar Database externa (.csv)</h3>
+    <ul>
+      <li>O que é um arquivo CSV?</li>
+      <ul>
+        <li>CSV significa "Comma-Separated Values" (Valores Separados por Vírgula).</li>
+        <li>É um formato de arquivo simples usado para armazenar dados tabulares, onde cada linha representa um registro e cada coluna representa um campo do registro.</li>
+        <li>As colunas são separadas por vírgulas, e as linhas são separadas por quebras de linha.</li>
+        <li>Para simplificar: é um arquivo Excel que computadores entendem.</li>
+      </ul>
+      <li>É possível adicionar idols, músicas e produtores além da database padrão usando um arquivo <code>.csv</code>.</li>
+      <li>Clique em <strong>⬆ Importar Database</strong> no bloco de Seleção de Idols.</li>
+      <li><strong>Atenção:</strong> a database importada é volátil — ela se perde ao recarregar a página.</li>
+    </ul>
+    
+    <br>
+    <strong style="color:#d4b4ff">Formato do CSV — Idols</strong>
+    <p style="color:#b8b8c8; font-size:13px; margin: 6px 0 4px">Cabeçalho obrigatório (nomes das colunas, nessa ordem):</p>
+    <code class="tut-code">Geracao,Tipo,ID,Nome,Grupo,Vocal,Dance,Rap,Center,Visual,Especialidade,ConceitosPredominantes,GenerosPredominantes,PontosFortes,PontosFracos</code>
+    <img src="../assets/tutorial/exemplo_idol_csv.png" style="width:100%; border-radius:8px; margin:10px 0">
+    <ul style="margin-top:10px">
+      <li>Monte um arquivo Excel com as colunas correspondentes ao cabeçalho acima (obrigatório)</li>
+      <li>A coluna <strong>Tipo</strong> deve ser preenchida com <code>idol</code></li>
+      <li>A coluna <strong>ID</strong> é simplesmente o nome do grupo e o nome do idol juntos: sem espaços, caracteres especiais ou acentos (ex: <code>unchildyeeun</code>)</li>
+      <li>As colunas dos Atributos (Vocal, Dance, Rap, Center, Visual) devem ser preenchidas com letras <code>S / A / B / C / D</code></li>
+      <li>As colunas <strong>Conceitos Predominantes</strong> e <strong>Gêneros Predominantes</strong> devem conter dois valores separados por <code>/</code> (ex: <code>Girl Crush / Performance</code>)</li>
+      <li>As colunas <strong>Pontos Fortes</strong> e <strong>Pontos Fracos</strong> não precisam ser preenchidas, são apenas observações. Mas caso escolham preencher, usem aspas duplas <code>"</code> para envolver seu conteúdo</li>
+    </ul>
+    
+    <br>
+    <strong style="color:#d4b4ff">Formato do CSV — Músicas</strong>
+    <code class="tut-code">Tipo,ID,Nome,Fonte,ConceitosOriginais,GenerosOriginais</code>
+    <img src="../assets/tutorial/exemplo_music_csv.png" style="width:100%; max-width:1000px; border-radius:8px; margin:10px 0">
+    <ul style="margin-top:10px">
+      <li>Monte um arquivo Excel com as colunas correspondentes ao cabeçalho acima (obrigatório)</li>
+      <li>A coluna <strong>Tipo</strong> deve ser preenchida com <code>music</code></li>
+      <li>A coluna <strong>ID</strong> é simplesmente o nome da fonte e o nome da música juntos: sem espaços, caracteres especiais ou acentos (ex: <code>girlsplanet999anotherdream</code>)</li>
+      <li>A coluna <strong>Fonte</strong> é o nome do programa ou álbum do qual a música faz parte</li>
+      <li>As colunas <strong>Conceitos Originais</strong> e <strong>Gêneros Originais</strong> devem conter três valores separados por <code>/</code> (ex: <code>Girl Crush / Performance</code>)</li>
+    </ul>
+    
+    <br>
+    <strong style="color:#d4b4ff">Formato do CSV — Produtores</strong>
+    <code class="tut-code">Tipo,ID,Nome,ConceitosPredominantes,GenerosPredominantes,MusicasConhecidas</code>
+    <img src="../assets/tutorial/exemplo_producer_csv.png" style="width:100%; border-radius:8px; margin:10px 0">
+    <ul style="margin-top:10px">
+      <li>Monte um arquivo Excel com as colunas correspondentes ao cabeçalho acima (obrigatório)</li>
+      <li>A coluna <strong>Tipo</strong> deve ser preenchida com <code>producer</code></li>
+      <li>A coluna <strong>ID</strong> é simplesmente producer mais o nome do produtor (ex: <code>producerartronicwaves</code>)</li>
+      <li>As colunas <strong>Conceitos Predominantes</strong> e <strong>Gêneros Predominantes</strong> devem conter três valores separados por <code>/</code> (ex: <code>Girl Crush / Performance</code>)</li>
+      <li>A coluna <strong>Músicas Conhecidas</strong> é opcional. Serve para exibir uma lista de músicas associadas ao produtor. Também deve conter aspas duplas <code>"</code></li>
+    </ul>
+
+    <br>
+    <strong style="color:#d4b4ff">Como montar o arquivo CSV (Excel):</strong>
+    <ul style="margin-top:10px 0 0">
+      <li>Apenas baixe os arquivos criados acima no formato .csv</li>
+    </ul>
+    <img src="../assets/tutorial/exemplo_csv.png" style="width:100%; border-radius:8px; margin: 0">
+    <p style="color:#b8b8c8; font-size:12px">O mesmo arquivo pode conter idols, músicas e produtores misturados — o sistema detecta pelo campo <code>Tipo</code>.</p>
+
+  </div>
+
+</div>`;
+
+//f:abrirTutorialLobby
+function abrirTutorialLobby() {
+  const modal = document.getElementById("modalTutorialLobby");
+  const body  = document.getElementById("modalTutorialLobbyBody");
+  if (!modal) return;
+  if (!body.dataset.loaded) {
+    body.innerHTML = TUTORIAL_LOBBY_HTML;
+    body.dataset.loaded = "1";
+  }
+  modal.style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+
+//f:fecharTutorialLobby
+function fecharTutorialLobby() {
+  const modal = document.getElementById("modalTutorialLobby");
+  if (modal) modal.style.display = "none";
+  document.body.style.overflow = "";
+}
+
+//f:fecharTutorialLobbyFora
+function fecharTutorialLobbyFora(event) {
+  if (event.target === document.getElementById("modalTutorialLobby")) fecharTutorialLobby();
+}
+
+
 
 //f:importarDraftTxt
 function importarDraftTxt(event) {
