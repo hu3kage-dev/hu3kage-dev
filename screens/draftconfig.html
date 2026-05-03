@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Stray7 Draft</title>
+  <title>Stray7 Configuração do Draft</title>
   
   <link rel="stylesheet" href="../css/styles.css">
 
@@ -21,21 +21,20 @@
   <div class="config-block block-1">
     <h3>Regras do Jogo</h3>
     <ul>
-      <li>Os jogadores podem escolher entre idols, músicas e produtores para compor seu time.</li>
-      <li>Ao desmarcar todas as músicas ou produtores, o draft será realizado apenas com idols.</li>
-      <li>Caso deseje inluir músicas e produtores, o número mínimo deve ser maior ou igual ao número de jogadores.</li>
-      <li>O pool (conjunto de itens disponíveis para seleção) é limitado ao número de jogadores para que a escolha de um jogador ativamente atrapalhe e influencie a escolha dos demais.</li>
-      <li>O formato do draft é em turnos, onde cada jogador escolhe um idol, música ou produtor por turno.</li>
-      <li>A ordem de escolha é em formato de cobrinha (Snake Draft), onde o primeiro jogador escolhe um item e os demais seguem em ordem. Quando o último jogador termina sua vez, a ordem é invertida e ele escolhe de novo. O mesmo acontece ao retornar para o primeiro jogador.</li>
-      <li>Cada idol possui atributos únicos, especialidades, conceitos predominantes, pontos fortes e fracos.</li>
-      <li>Cada produtor possui conceitos predominantes, e outros conceitos. Isto influencia na regra abaixo.</li>
-      <li>Caso o gênero da música não combine com a sua formação de grupo, você pode tentar mudar o gênero, porém a chance de sucesso depende dos atributos dos idols e produtores escolhidos.</li>
-      <li>O objetivo é criar o melhor time possível com as variáveis disponíveis.</li>
-      <li>Este jogo ainda está em desenvolvimento, e os atributos não representam os valores reais das capacidades de um idol.</li>
+      <li>Monte um time escolhendo idols, músicas e produtores no formato Snake Draft.</li>
+      <li>O Pool é limitado ao número de jogadores — pegar um item prejudica diretamente os outros.</li>
+      <li>A ordem dos turnos inverte a cada rodada (cobrinha): quem escolheu por último joga duas vezes seguidas.</li>
+      <li>Combine conceitos e gêneros entre idols, músicas e produtores para maximizar a pontuação.</li>
+      <li>Músicas e produtores são opcionais — ao desmarcá-los, o draft usa apenas idols.</li>
+      <li>Este jogo ainda está em desenvolvimento.</li>
     </ul>
+    <div class="tut-btn-row">
+      <button class="btn-tutorial" onclick="abrirTutorial()">Ver Tutorial Completo</button>
+      <button class="btn-tutorial" onclick="abrirTutorialLobby()">Ver Tutoriais de Importação</button>
+    </div>
   </div>
 
-  <div class="config-block block-2">
+  <div class="config-block block-2" style="grid-column: 2 / -1">
     <h3>Opções de Configuração</h3>
     <div class="b2-body">
 
@@ -63,9 +62,9 @@
   </div>
 
     </div>
-    </div>
+  </div>
 
-    <div class="config-block block-3">
+  <div class="config-block block-3">
       <h3>Seleção de Idols e Grupos</h3>
       <div id="idolFilter">
         <div class="idol-filter-row">
@@ -80,7 +79,7 @@
           </div>
         </div>
         <div class="idol-filter-row">
-          <span class="idol-filter-label">Grupos:</span>
+          <span class="idol-filter-label">Inicial:</span>
           <div class="idol-filter-pills" id="filterLetra">
             <button class="filter-pill active" data-filter="letra" data-value="all" onclick="setFiltro('letra','all')">Todas</button>
             <button class="filter-pill" data-filter="letra" data-value="09" onclick="setFiltro('letra','09')">0–9 @ #</button>
@@ -143,6 +142,20 @@
             <div id="producerContainer" class="scroll-box"></div>
         </div>
     </div>
+  </div>
+</div>
+
+<div id="modalTutorial" class="modal-tutorial" onclick="fecharTutorialFora(event)">
+  <div class="modal-tutorial-content">
+    <button class="modal-tutorial-close" onclick="fecharTutorial()">✕</button>
+    <div id="modalTutorialBody">Carregando...</div>
+  </div>
+</div>
+
+<div id="modalTutorialLobby" class="modal-tutorial" onclick="fecharTutorialLobbyFora(event)">
+  <div class="modal-tutorial-content">
+    <button class="modal-tutorial-close" onclick="fecharTutorialLobby()">✕</button>
+    <div id="modalTutorialLobbyBody"></div>
   </div>
 </div>
 
