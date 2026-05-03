@@ -604,4 +604,9 @@ function mostrarMensagemErro(pi, mensagem) {
   }
 }
 
+//f:todosTravados
+function todosTravados() {
+  return simData.ordem.every(pi => lockedPlayers[pi]);
+}
+
 //tá lendo isso por quê, curioso?
