@@ -1,9 +1,10 @@
 // =============================
 // CONSTANTES VARIÁVEIS GLOBAIS
 // =============================
-const ROLE_OPTIONS_IDOL = ["Posição","Main Vocal","Sub-vocal","Main Dancer","Lead Dancer","Main Rapper","Lead Rapper","Visual","Center"];
-const ROLE_OPTIONS_EXTRA = ["Conceito","Cute","Dark Fantasy", "Dreamcore", "Dreamy", "Emotional","Girl Crush","Performance","Teen Crush"];
-const NUMBERED_ROLES = ["Sub-vocal","Lead Dancer","Lead Rapper"];
+const ROLE_OPTIONS_IDOL = ["Posição","Main Vocal","Lead Vocal","Main Dancer","Lead Dancer","Main Rapper","Lead Rapper","Visual","Center"];
+const ROLE_OPTIONS_MUSIC = ["Gênero","EDM","Electro/Synth","Emotional","Experimental","Groove","Hip-Hop","Pop","R&B","Rock","Tropical"];
+const ROLE_OPTIONS_PRODUCER = ["Conceito","Cute","Conceptual","Dark","Dreamcore","Elegant","Girl Crush","Mature","Performance","Swag","Teen Crush"];
+const NUMBERED_ROLES = ["Lead Vocal","Lead Dancer","Lead Rapper"];
 let simData       = null;
 let boardSlots    = {};
 let poolCards     = {}; 
@@ -40,14 +41,18 @@ window.onload = function () {
   }
   simData = JSON.parse(raw);
   simData.ordem.forEach(pi => {
-    const p = simData.picks[pi];
+  const p = simData.picks[pi];
+  if (simData.pickOrder?.[pi]?.length) {
+    poolCards[pi] = simData.pickOrder[pi].map(c => ({...c}));
+  } else {
     const cards = [];
     if (p) {
       (p.idol     || []).forEach(c => { if (c) cards.push({...c}); });
       (p.music    || []).forEach(c => { if (c) cards.push({...c}); });
       (p.producer || []).forEach(c => { if (c) cards.push({...c}); });
     }
-    poolCards[pi]  = cards;
+    poolCards[pi] = cards;
+  }
     boardSlots[pi] = {
       idol:     Array(simData.config.integrantes).fill(null),
       music:    simData.config.usarMusica    ? [null] : [],
@@ -316,7 +321,7 @@ function render() {
       wrap.appendChild(card);
       poolWrap.appendChild(wrap);
     });
-
+    injetarBotaoResultado();
     poolSection.appendChild(poolWrap);
     section.appendChild(poolSection);
     container.appendChild(section);
@@ -346,7 +351,9 @@ function criarSlotWrapper(pi, tipo, idx, item, isLocked) {
   select.className = "roleSelect";
   select.disabled = isLocked;
   const currentRole = roleBoard[pi][tipo][idx] || "—";
-  const opcoes = tipo === "idol" ? ROLE_OPTIONS_IDOL : ROLE_OPTIONS_EXTRA;
+  const opcoes = tipo === "idol" ? ROLE_OPTIONS_IDOL
+             : tipo === "music" ? ROLE_OPTIONS_MUSIC
+             : ROLE_OPTIONS_PRODUCER;
   opcoes.forEach(opt => {
     const o = document.createElement("option");
     o.value = opt;
@@ -534,19 +541,23 @@ function abrirModal(item) {
       <p><b>Rap:</b> ${cleanText(item.rap)}</p>
       <p><b>Center:</b> ${cleanText(item.center)}</p>
       <p><b>Visual:</b> ${cleanText(item.visual)}</p>
-      <p><b>Conceito Predominante:</b> ${cleanText(item.conceito)}</p>
+      <p><b>Especialidade:</b> ${cleanText(item.especialidade)}</p>
+      <p><b>Conceitos Predominantes:</b> ${cleanText(item.conceitos)}</p>
+      <p><b>Gêneros Predominantes:</b> ${cleanText(item.generos)}</p>
       <p><b>Pontos Fortes:</b> ${cleanText(item.fortes)}</p>
       <p><b>Pontos Fracos:</b> ${cleanText(item.fracos)}</p>
     `;
   } else if (itemType === "music") {
     bodyContent = `
       <p><b>Fonte:</b> ${cleanText(item.fonte)}</p>
-      <p><b>Conceito Original:</b> ${cleanText(item.conceito)}</p>
+      <p><b>Conceitos Originais:</b> ${cleanText(item.conceitos)}</p>
+      <p><b>Gêneros Originais:</b> ${cleanText(item.generos)}</p>
     `;
   } else if (itemType === "producer") {
     bodyContent = `
-      <p><b>Conceito Predominante:</b> ${cleanText(item.conceito)}</p>
-      <p><b>Outros Conceitos:</b> ${cleanText(item.outrosconceitos)}</p>
+      <p><b>Conceitos Predominantes:</b> ${cleanText(item.conceitos)}</p>
+      <p><b>Gêneros Predominantes:</b> ${cleanText(item.generos)}</p>
+      <p><b>Músicas Conhecidas:</b> ${cleanText(item.musicas)}</p>
     `;
   }
   modal.innerHTML = `
