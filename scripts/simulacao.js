@@ -1,10 +1,9 @@
 // =============================
 // CONSTANTES VARIÁVEIS GLOBAIS
 // =============================
-const ROLE_OPTIONS_IDOL = ["Posição","Main Vocal","Lead Vocal","Main Dancer","Lead Dancer","Main Rapper","Lead Rapper","Visual","Center"];
-const ROLE_OPTIONS_MUSIC = ["Gênero","EDM","Electro/Synth","Emotional","Experimental","Groove","Hip-Hop","Pop","R&B","Rock","Tropical"];
-const ROLE_OPTIONS_PRODUCER = ["Conceito","Cute","Conceptual","Dark","Dreamcore","Elegant","Girl Crush","Mature","Performance","Swag","Teen Crush"];
-const NUMBERED_ROLES = ["Lead Vocal","Lead Dancer","Lead Rapper"];
+const ROLE_OPTIONS_IDOL = ["Posição","Main Vocal","Sub-vocal","Main Dancer","Lead Dancer","Main Rapper","Lead Rapper","Visual","Center"];
+const ROLE_OPTIONS_EXTRA = ["Conceito","Cute","Dark Fantasy", "Dreamcore", "Dreamy", "Emotional","Girl Crush","Performance","Teen Crush"];
+const NUMBERED_ROLES = ["Sub-vocal","Lead Dancer","Lead Rapper"];
 let simData       = null;
 let boardSlots    = {};
 let poolCards     = {}; 
@@ -41,18 +40,14 @@ window.onload = function () {
   }
   simData = JSON.parse(raw);
   simData.ordem.forEach(pi => {
-  const p = simData.picks[pi];
-  if (simData.pickOrder?.[pi]?.length) {
-    poolCards[pi] = simData.pickOrder[pi].map(c => ({...c}));
-  } else {
+    const p = simData.picks[pi];
     const cards = [];
     if (p) {
       (p.idol     || []).forEach(c => { if (c) cards.push({...c}); });
       (p.music    || []).forEach(c => { if (c) cards.push({...c}); });
       (p.producer || []).forEach(c => { if (c) cards.push({...c}); });
     }
-    poolCards[pi] = cards;
-  }
+    poolCards[pi]  = cards;
     boardSlots[pi] = {
       idol:     Array(simData.config.integrantes).fill(null),
       music:    simData.config.usarMusica    ? [null] : [],
@@ -278,29 +273,12 @@ function render() {
     // Botão travar
     const btn = document.createElement("button");
     const pronto = podeTravar(pi);
-    btn.className = "btnTravar" + (isLocked ? " btnTravado" : "") + (!pronto ? " btnDesabilitado" : "");
+    btn.className = "btnTravar" + (isLocked ? " btnTravado" : "");
     btn.innerText = isLocked ? "🔒 Travado" : "Travar Escolha";
-    btn.disabled  = isLocked;
+    btn.disabled  = isLocked || !pronto;
     if (!isLocked && !pronto) btn.title = "Preencha todos os slots e defina todos os papéis";
-    btn.onclick   = () => {
-      if (pronto) {
-        lockedPlayers[pi] = true;
-        render();
-      } else {
-        mostrarMensagemErro(pi, "Preencha todos os slots e defina todos os papéis antes de travar a escolha.");
-      }
-    };
-    const btnWrapper = document.createElement("div");
-    btnWrapper.className = "btnTravarWrapper";
-
-    const msgErro = document.createElement("div");
-    msgErro.className = "simMensagemErro";
-    msgErro.id = `msgErro-${pi}`;
-    msgErro.style.display = "none";
-    btnWrapper.appendChild(msgErro);
-
-    btnWrapper.appendChild(btn);
-    playerRow.appendChild(btnWrapper);
+    btn.onclick   = () => { lockedPlayers[pi] = true; render(); };
+    playerRow.appendChild(btn);
     section.appendChild(playerRow);
     // Pool pessoal
     const poolSection = document.createElement("div");
@@ -321,7 +299,7 @@ function render() {
       wrap.appendChild(card);
       poolWrap.appendChild(wrap);
     });
-    injetarBotaoResultado();
+
     poolSection.appendChild(poolWrap);
     section.appendChild(poolSection);
     container.appendChild(section);
@@ -351,9 +329,7 @@ function criarSlotWrapper(pi, tipo, idx, item, isLocked) {
   select.className = "roleSelect";
   select.disabled = isLocked;
   const currentRole = roleBoard[pi][tipo][idx] || "—";
-  const opcoes = tipo === "idol" ? ROLE_OPTIONS_IDOL
-             : tipo === "music" ? ROLE_OPTIONS_MUSIC
-             : ROLE_OPTIONS_PRODUCER;
+  const opcoes = tipo === "idol" ? ROLE_OPTIONS_IDOL : ROLE_OPTIONS_EXTRA;
   opcoes.forEach(opt => {
     const o = document.createElement("option");
     o.value = opt;
@@ -550,14 +526,12 @@ function abrirModal(item) {
   } else if (itemType === "music") {
     bodyContent = `
       <p><b>Fonte:</b> ${cleanText(item.fonte)}</p>
-      <p><b>Conceitos Originais:</b> ${cleanText(item.conceitos)}</p>
-      <p><b>Gêneros Originais:</b> ${cleanText(item.generos)}</p>
+      <p><b>Conceito Original:</b> ${cleanText(item.conceito)}</p>
     `;
   } else if (itemType === "producer") {
     bodyContent = `
-      <p><b>Conceitos Predominantes:</b> ${cleanText(item.conceitos)}</p>
-      <p><b>Gêneros Predominantes:</b> ${cleanText(item.generos)}</p>
-      <p><b>Músicas Conhecidas:</b> ${cleanText(item.musicas)}</p>
+      <p><b>Conceito Predominante:</b> ${cleanText(item.conceito)}</p>
+      <p><b>Outros Conceitos:</b> ${cleanText(item.outrosconceitos)}</p>
     `;
   }
   modal.innerHTML = `
@@ -589,24 +563,6 @@ function podeTravar(pi) {
     }
   }
   return true;
-}
-
-//f:mostrarMensagemErro
-function mostrarMensagemErro(pi, mensagem) {
-  const msgElement = document.getElementById(`msgErro-${pi}`);
-  if (msgElement) {
-    msgElement.innerText = mensagem;
-    msgElement.style.display = "block";
-    // Esconder após 5 segundos
-    setTimeout(() => {
-      msgElement.style.display = "none";
-    }, 5000);
-  }
-}
-
-//f:todosTravados
-function todosTravados() {
-  return simData.ordem.every(pi => lockedPlayers[pi]);
 }
 
 //tá lendo isso por quê, curioso?
