@@ -526,21 +526,25 @@ function abrirModal(item) {
   } else if (itemType === "music") {
     bodyContent = `
       <p><b>Fonte:</b> ${cleanText(item.fonte)}</p>
-      <p><b>Conceito Original:</b> ${cleanText(item.conceito)}</p>
+      <p><b>Conceitos Originais:</b> ${cleanText(item.conceitos)}</p>
+      <p><b>Gêneros Originais:</b> ${cleanText(item.generos)}</p>
     `;
   } else if (itemType === "producer") {
     bodyContent = `
-      <p><b>Conceito Predominante:</b> ${cleanText(item.conceito)}</p>
-      <p><b>Outros Conceitos:</b> ${cleanText(item.outrosconceitos)}</p>
+      <p><b>Conceitos Predominantes:</b> ${cleanText(item.conceitos)}</p>
+      <p><b>Gêneros Predominantes:</b> ${cleanText(item.generos)}</p>
+      <p><b>Músicas Conhecidas:</b> ${cleanText(item.musicas)}</p>
     `;
   }
   modal.innerHTML = `
     <div class="modalContent">
-      <span class="closeBtn" onclick="fecharModal()">X</span>
       <img src="${getCardImageCandidates(item)[0]}" class="modalImg"
            onerror="this.onerror=null;this.src='';">
-      <h2>${cleanText(item.name)}</h2>
-      ${bodyContent}
+      <div class="modalBody">
+        <span class="closeBtn" onclick="fecharModal()">✕</span>
+        <h2>${cleanText(item.name)}</h2>
+        ${bodyContent}
+      </div>
     </div>
   `;
   modal.onclick = e => { if (e.target === modal) fecharModal(); };
