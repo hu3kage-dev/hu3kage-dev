@@ -2,7 +2,8 @@
 // CONSTANTES VARIÁVEIS GLOBAIS
 // =============================
 const ROLE_OPTIONS_IDOL = ["Posição","Main Vocal","Sub-vocal","Main Dancer","Lead Dancer","Main Rapper","Lead Rapper","Visual","Center"];
-const ROLE_OPTIONS_EXTRA = ["Conceito","Cute","Dark Fantasy", "Dreamcore", "Dreamy", "Emotional","Girl Crush","Performance","Teen Crush"];
+const ROLE_OPTIONS_MUSIC = ["Gênero","EDM","Electro/Synth","Emotional","Experimental","Groove","Hip-Hop","Pop","R&B","Rock","Tropical"];
+const ROLE_OPTIONS_PRODUCER = ["Conceito","Conceptual","Cute","Dark","Dreamcore","Elegant","Girl Crush","Mature","Performance","Swag","Teen Crush"];
 const NUMBERED_ROLES = ["Sub-vocal","Lead Dancer","Lead Rapper"];
 let simData       = null;
 let boardSlots    = {};
@@ -271,14 +272,30 @@ function render() {
     }
     playerRow.appendChild(extras);
     // Botão travar
+    const btnWrapper = document.createElement("div");
+    btnWrapper.className = "btnTravarWrapper";
+    const msgErro = document.createElement("div");
+    msgErro.className = "simMensagemErro";
+    msgErro.innerText = "Preencha todos os slots e defina todos os papéis antes de travar.";
     const btn = document.createElement("button");
     const pronto = podeTravar(pi);
-    btn.className = "btnTravar" + (isLocked ? " btnTravado" : "");
+    btn.className = "btnTravar" + (isLocked ? " btnTravado" : !pronto ? " btnDesabilitado" : "");
     btn.innerText = isLocked ? "🔒 Travado" : "Travar Escolha";
-    btn.disabled  = isLocked || !pronto;
-    if (!isLocked && !pronto) btn.title = "Preencha todos os slots e defina todos os papéis";
-    btn.onclick   = () => { lockedPlayers[pi] = true; render(); };
-    playerRow.appendChild(btn);
+    btn.disabled  = isLocked;
+    btn.onclick = () => {
+      if (isLocked) return;
+      if (!podeTravar(pi)) {
+        msgErro.style.display = "block";
+        clearTimeout(msgErro._timeout);
+        msgErro._timeout = setTimeout(() => { msgErro.style.display = "none"; }, 3000);
+        return;
+      }
+      lockedPlayers[pi] = true;
+      render();
+    };
+    btnWrapper.appendChild(msgErro);
+    btnWrapper.appendChild(btn);
+    playerRow.appendChild(btnWrapper);
     section.appendChild(playerRow);
     // Pool pessoal
     const poolSection = document.createElement("div");
@@ -329,7 +346,11 @@ function criarSlotWrapper(pi, tipo, idx, item, isLocked) {
   select.className = "roleSelect";
   select.disabled = isLocked;
   const currentRole = roleBoard[pi][tipo][idx] || "—";
-  const opcoes = tipo === "idol" ? ROLE_OPTIONS_IDOL : ROLE_OPTIONS_EXTRA;
+  const opcoes = tipo === "idol"
+    ? ROLE_OPTIONS_IDOL
+    : tipo === "music"
+      ? ROLE_OPTIONS_MUSIC
+      : ROLE_OPTIONS_PRODUCER;
   opcoes.forEach(opt => {
     const o = document.createElement("option");
     o.value = opt;
