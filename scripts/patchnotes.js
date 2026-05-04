@@ -19,6 +19,13 @@ const PATCHES = [
           "Um tutorial de importação e exportação foi adicionado em <span class='hl'>Configuração do Draft</span> para orientar os jogadores sobre como usar os novos recursos de importação de lobby e database volátil.",
         ]
       },
+      {
+        type: "fix",
+        label: "Correções",
+        items: [
+          "Os modais foram ajustados para que nenhum conteúdo de texto escape, e a identidade visual também foi atualizada para combinar com o sistema.",
+        ]
+      }
     ]
   },
   {
