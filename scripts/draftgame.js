@@ -764,51 +764,47 @@ function abrirModal(item) {
     return text.toString().replace(/"{3}/g, '"').replace(/^['"]|['"]$/g, "").trim();
   };
   let bodyContent = "";
-  //idol
   if (itemType === "idol") {
     bodyContent = `
-    <p><b>Grupo:</b> ${cleanText(item.group)}</p>
-    <p><b>Vocal:</b> ${cleanText(item.vocal)}</p>
-    <p><b>Dance:</b> ${cleanText(item.dance)}</p>
-    <p><b>Rap:</b> ${cleanText(item.rap)}</p>
-    <p><b>Center:</b> ${cleanText(item.center)}</p>
-    <p><b>Visual:</b> ${cleanText(item.visual)}</p>
-    <p><b>Especialidade:</b> ${cleanText(item.especialidade)}</p>
-    <p><b>Conceitos Predominantes:</b> ${cleanText(item.conceitos)}</p>
-    <p><b>Gêneros Predominantes:</b> ${cleanText(item.generos)}</p>
-    <p><b>Pontos Fortes:</b> ${cleanText(item.fortes)}</p>
-    <p><b>Pontos Fracos:</b> ${cleanText(item.fracos)}</p>
+      <p><b>Grupo:</b> ${cleanText(item.group)}</p>
+      <p><b>Vocal:</b> ${cleanText(item.vocal)}</p>
+      <p><b>Dance:</b> ${cleanText(item.dance)}</p>
+      <p><b>Rap:</b> ${cleanText(item.rap)}</p>
+      <p><b>Center:</b> ${cleanText(item.center)}</p>
+      <p><b>Visual:</b> ${cleanText(item.visual)}</p>
+      <p><b>Especialidade:</b> ${cleanText(item.especialidade)}</p>
+      <p><b>Conceitos Predominantes:</b> ${cleanText(item.conceitos)}</p>
+      <p><b>Gêneros Predominantes:</b> ${cleanText(item.generos)}</p>
+      <p><b>Pontos Fortes:</b> ${cleanText(item.fortes)}</p>
+      <p><b>Pontos Fracos:</b> ${cleanText(item.fracos)}</p>
     `;
-    //music
   } else if (itemType === "music") {
     bodyContent = `
-    <p><b>Fonte:</b> ${cleanText(item.fonte)}</p>
-    <p><b>Conceitos Originais:</b> ${cleanText(item.conceitos)}</p>
-    <p><b>Gêneros Originais:</b> ${cleanText(item.generos)}</p>
+      <p><b>Fonte:</b> ${cleanText(item.fonte)}</p>
+      <p><b>Conceitos Originais:</b> ${cleanText(item.conceitos)}</p>
+      <p><b>Gêneros Originais:</b> ${cleanText(item.generos)}</p>
     `;
-    //producer
   } else if (itemType === "producer") {
     bodyContent = `
-    <p><b>Conceitos Predominantes:</b> ${cleanText(item.conceitos)}</p>
-    <p><b>Gêneros Predominantes:</b> ${cleanText(item.generos)}</p>
-    <p><b>Músicas Conhecidas:</b> ${cleanText(item.musicas)}</p>
+      <p><b>Conceitos Predominantes:</b> ${cleanText(item.conceitos)}</p>
+      <p><b>Gêneros Predominantes:</b> ${cleanText(item.generos)}</p>
+      <p><b>Músicas Conhecidas:</b> ${cleanText(item.musicas)}</p>
     `;
   } else {
     bodyContent = `<p><b>Tipo:</b> ${itemType}</p>`;
   }
   modal.innerHTML = `
   <div class="modalContent">
-  <span class="closeBtn" onclick="fecharModal()">X</span>
-  <img src="${getCardImageSrc(item)}" class="modalImg">
-  <h2>${cleanText(item.name)}</h2>
-  ${bodyContent}
+    <img src="${getCardImageSrc(item)}" class="modalImg"
+         onerror="this.onerror=null;this.src='';">
+    <div class="modalBody">
+      <span class="closeBtn" onclick="fecharModal()">✕</span>
+      <h2>${cleanText(item.name)}</h2>
+      ${bodyContent}
+    </div>
   </div>
   `;
-  modal.onclick = (e) => {
-    if (e.target === modal) {
-      fecharModal();
-    }
-  };
+  modal.onclick = (e) => { if (e.target === modal) fecharModal(); };
 }
 
 //f:fecharModal
