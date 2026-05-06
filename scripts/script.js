@@ -59,7 +59,7 @@ function injetarHeader() {
       }).join("")}
     </nav>
     <div class="header-right">
-      <span class="header-badge">v0.4.3</span>
+      <span class="header-badge">v0.4.4</span>
     </div>
   `;
   document.body.prepend(header);

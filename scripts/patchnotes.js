@@ -6,6 +6,28 @@
 // ========================
 const PATCHES = [
   {
+    version: "v0.4.4",
+    title: "Nova Database de músicas e fotos.",
+    date: "2025-05-03",
+    type: "minor",
+    sections: [
+      {
+        type: "new",
+        label: "Novo",
+        items: [
+          "Foram adicionadas mais de 90 novas músicas com imagens de card, descrição de conceitos e gêneros.",
+        ]
+      },
+      {
+        type: "fix",
+        label: "Correções",
+        items: [
+          "Corrigido um erro onde os cards puxavam dados incorretos para músicas e produtores de mesmo nome.",
+        ]
+      }
+    ]
+  },
+  {
     version: "v0.4.3",
     title: "Melhorias na Exibição dos Tutoriais.",
     date: "2025-05-03",
