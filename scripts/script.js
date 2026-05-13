@@ -109,10 +109,10 @@ function modoEmDesenvolvimento() {
  
 // quantidade de variações por menu
 const MENU_IMAGE_POOL = {
-  draft: 4,
-  quiz: 3,
-  gacha: 4,
-  manager: 3
+  draft: 5,
+  quiz: 5,
+  gacha: 6,
+  manager: 6
 };
 
 //f:sortearImagemMenu
