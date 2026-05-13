@@ -107,16 +107,31 @@ function modoEmDesenvolvimento() {
 // IMAGENS DE MENU
 // ========================
  
+// quantidade de variações por menu
+const MENU_IMAGE_POOL = {
+  draft: 4,
+  quiz: 3,
+  gacha: 4,
+  manager: 3
+};
+
+//f:sortearImagemMenu
+function sortearImagemMenu(nome) {
+  const max = MENU_IMAGE_POOL[nome] || 1;
+  return Math.floor(Math.random() * max) + 1;
+}
+
 //f:aplicarImagemMenu
 function aplicarImagemMenu(imgEl, nome) {
   const extensoes = ["jpg", "png", "jpeg", "webp"];
+  const numero = sortearImagemMenu(nome);
   let i = 0;
   function tentar() {
     if (i >= extensoes.length) {
       imgEl.removeAttribute("src");
       return;
     }
-    imgEl.src = `assets/menus/index_${nome}.${extensoes[i++]}`;
+    imgEl.src = `assets/menus/index_${nome}_${numero}.${extensoes[i++]}`;
   }
   imgEl.onerror = tentar;
   tentar();
