@@ -106,68 +106,41 @@ function modoEmDesenvolvimento() {
 // ========================
 // IMAGENS DE MENU
 // ========================
- 
-const MENU_EXTENSOES = ["jpg", "png", "jpeg", "webp"];
+
 const MENU_INTERVALO = 5000;
-const menuImagens = {};
 const menuEstado = {};
- 
-//f:descobrirImagensMenu
-function descobrirImagensMenu(nome) {
-  return new Promise(resolve => {
-    const imagens = [];
-    let numero = 1;
- 
-    function tentarProximo() {
-      const candidatos = MENU_EXTENSOES.map(ext => `assets/menus/index_${nome}_${numero}.${ext}`);
-      let idx = 0;
- 
-      function tentarExt() {
-        if (idx >= candidatos.length) {
-          // nenhuma extensão funcionou para este número — encerrar busca
-          resolve(imagens);
-          return;
-        }
-        const img = new Image();
-        img.onerror = () => { idx++; tentarExt(); };   // registrado ANTES de src
-        img.onload  = () => { imagens.push(candidatos[idx]); numero++; tentarProximo(); };
-        img.src = candidatos[idx];
-      }
-      tentarExt();
-    }
-    tentarProximo();
-  });
-}
- 
+
 //f:trocarImagemMenu
-function trocarImagemMenu(imgEl, nome) {
-  const lista = menuImagens[nome];
-  if (!lista?.length) return;
+function trocarImagemMenu(imgEl, lista) {
+  const nome = imgEl.dataset.menu;
   if (menuEstado[nome] == null) menuEstado[nome] = 0;
   menuEstado[nome] = (menuEstado[nome] + 1) % lista.length;
-  const novaSrc = lista[menuEstado[nome]];
   imgEl.classList.add("fade-out");
   setTimeout(() => {
-    imgEl.src = novaSrc;
+    imgEl.src = lista[menuEstado[nome]];
     imgEl.onload = () => imgEl.classList.remove("fade-out");
   }, 250);
 }
- 
+
 //f:iniciarCarouselMenus
-async function iniciarCarouselMenus() {
-  const imgs = document.querySelectorAll(".mode-image[data-menu]");
-  for (const img of imgs) {
-    const nome = img.dataset.menu;
-    const lista = await descobrirImagensMenu(nome);
-    if (!lista.length) continue;
-    menuImagens[nome] = lista;
-    menuEstado[nome] = 0;
+function iniciarCarouselMenus() {
+  // MENU_IMAGENS deve ser declarado em assets/menus/menus.js (carregado antes de script.js)
+  // Exemplo: const MENU_IMAGENS = { draft: ["assets/menus/index_draft_1.jpg", ...] }
+  if (typeof MENU_IMAGENS === "undefined") {
+    console.warn("MENU_IMAGENS não encontrado. Crie assets/menus/menus.js com o manifesto.");
+    return;
+  }
+  document.querySelectorAll(".mode-image[data-menu]").forEach(img => {
+    const lista = MENU_IMAGENS[img.dataset.menu];
+    if (!lista?.length) return;
+    menuEstado[img.dataset.menu] = 0;
     img.src = lista[0];
     if (lista.length > 1) {
-      setInterval(() => trocarImagemMenu(img, nome), MENU_INTERVALO);
+      setInterval(() => trocarImagemMenu(img, lista), MENU_INTERVALO);
     }
-  }
+  });
 }
+
 
 // ========================
 // FUNÇÕES DE BLOCOS
