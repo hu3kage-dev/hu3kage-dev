@@ -952,13 +952,14 @@ const TUTORIAL_LOBBY_HTML = `
     <br>
     <strong style="color:#d4b4ff">Formato do CSV — Idols</strong>
     <p style="color:#b8b8c8; font-size:13px; margin: 6px 0 4px">Cabeçalho obrigatório (nomes das colunas, nessa ordem):</p>
-    <code class="tut-code">Geracao,Tipo,ID,Nome,Grupo,Vocal,Dance,Rap,Center,Visual,Especialidade,ConceitosPredominantes,GenerosPredominantes,PontosFortes,PontosFracos</code>
+    <code class="tut-code">Geracao,Tipo,ID,Nome,Grupo,Aniversário,Vocal,Dance,Rap,Center,Visual,Especialidade,ConceitosPredominantes,GenerosPredominantes,PontosFortes,PontosFracos</code>
     <img src="../assets/tutorial/exemplo_idol_csv.png" style="width:100%; border-radius:8px; margin:10px 0">
     <ul style="margin-top:10px">
       <li>Monte um arquivo Excel com as colunas correspondentes ao cabeçalho acima (obrigatório)</li>
       <li>A coluna <strong>Tipo</strong> deve ser preenchida com <code>idol</code></li>
       <li>A coluna <strong>ID</strong> é simplesmente o nome do grupo e o nome do idol juntos: sem espaços, caracteres especiais ou acentos (ex: <code>unchildyeeun</code>)</li>
-      <li>As colunas dos Atributos (Vocal, Dance, Rap, Center, Visual) devem ser preenchidas com letras <code>S / A / B / C / D</code></li>
+      <li>As colunas dos <strong>Atributos (Vocal, Dance, Rap, Center, Visual)</strong> devem ser preenchidas com letras <code>S / A / B / C / D</code></li>
+      <li>A coluna <strong>Aniversário</strong> é opcional, contém apenas a data de nascimento do Idol no formato dd-mm-aaaa. O formato pode ser alterado, inclusive, pode ser escrito por extenso. Evite usar vírgula, pois isso quebra o parse do <code>.csv</code></li>
       <li>As colunas <strong>Conceitos Predominantes</strong> e <strong>Gêneros Predominantes</strong> devem conter dois valores separados por <code>/</code> (ex: <code>Girl Crush / Performance</code>)</li>
       <li>As colunas <strong>Pontos Fortes</strong> e <strong>Pontos Fracos</strong> não precisam ser preenchidas, são apenas observações. Mas caso escolham preencher, usem aspas duplas <code>"</code> para envolver seu conteúdo</li>
     </ul>
@@ -972,7 +973,7 @@ const TUTORIAL_LOBBY_HTML = `
       <li>A coluna <strong>Tipo</strong> deve ser preenchida com <code>music</code></li>
       <li>A coluna <strong>ID</strong> é simplesmente o nome da fonte e o nome da música juntos: sem espaços, caracteres especiais ou acentos (ex: <code>girlsplanet999anotherdream</code>)</li>
       <li>A coluna <strong>Fonte</strong> é o nome do programa ou álbum do qual a música faz parte</li>
-      <li>As colunas <strong>Conceitos Originais</strong> e <strong>Gêneros Originais</strong> devem conter três valores separados por <code>/</code> (ex: <code>Girl Crush / Performance</code>)</li>
+      <li>As colunas <strong>Conceitos Originais</strong> e <strong>Gêneros Originais</strong> devem conter três valores separados por <code>/</code> (ex: <code>Girl Crush / Performance / Dreamcore</code>)</li>
     </ul>
     
     <br>
@@ -983,8 +984,8 @@ const TUTORIAL_LOBBY_HTML = `
       <li>Monte um arquivo Excel com as colunas correspondentes ao cabeçalho acima (obrigatório)</li>
       <li>A coluna <strong>Tipo</strong> deve ser preenchida com <code>producer</code></li>
       <li>A coluna <strong>ID</strong> é simplesmente producer mais o nome do produtor (ex: <code>producerartronicwaves</code>)</li>
-      <li>As colunas <strong>Conceitos Predominantes</strong> e <strong>Gêneros Predominantes</strong> devem conter três valores separados por <code>/</code> (ex: <code>Girl Crush / Performance</code>)</li>
-      <li>A coluna <strong>Músicas Conhecidas</strong> é opcional. Serve para exibir uma lista de músicas associadas ao produtor. Também deve conter aspas duplas <code>"</code></li>
+      <li>As colunas <strong>Conceitos Predominantes</strong> e <strong>Gêneros Predominantes</strong> devem conter três valores separados por <code>/</code> (ex: <code>Girl Crush / Performance / Conceptual</code>)</li>
+      <li>A coluna <strong>Músicas Conhecidas</strong> é opcional. Serve para exibir uma lista de músicas associadas ao produtor. Não existe um limite de músicas, mas devem estar separadas por / (ex: <code>tripleS - Rising / ARTMS - Icarus / LOONA Olivia Hye - Egoist / LOONA Hyunjin - Around You / LOONA Haseul - Let Me In</code>)</li>
     </ul>
 
     <br>
