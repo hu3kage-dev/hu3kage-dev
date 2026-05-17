@@ -773,6 +773,7 @@ function abrirModal(item) {
   if (itemType === "idol") {
     bodyContent = `
       <p><b>Grupo:</b> ${cleanText(item.group)}</p>
+      <p><b>Aniversário:</b> ${cleanText(item.aniversario)}</p>
       <p><b>Vocal:</b> ${cleanText(item.vocal)}</p>
       <p><b>Dance:</b> ${cleanText(item.dance)}</p>
       <p><b>Rap:</b> ${cleanText(item.rap)}</p>
