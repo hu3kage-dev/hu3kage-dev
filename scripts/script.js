@@ -124,8 +124,6 @@ function trocarImagemMenu(imgEl, lista) {
 
 //f:iniciarCarouselMenus
 function iniciarCarouselMenus() {
-  // MENU_IMAGENS deve ser declarado em assets/menus/menus.js (carregado antes de script.js)
-  // Exemplo: const MENU_IMAGENS = { draft: ["assets/menus/index_draft_1.jpg", ...] }
   if (typeof MENU_IMAGENS === "undefined") {
     console.warn("MENU_IMAGENS não encontrado. Crie assets/menus/menus.js com o manifesto.");
     return;
@@ -140,7 +138,6 @@ function iniciarCarouselMenus() {
     }
   });
 }
-
 
 // ========================
 // FUNÇÕES DE BLOCOS
@@ -657,10 +654,10 @@ function normalizarChave(chave) {
     .replace(/\s+/g, "");
 }
 
-//f:parseArrayDB (usa "/" como separador interno)
+//f:parseArrayDB (suporta "/" e " / " como separadores)
 function parseArrayDB(valor) {
   if (!valor) return [];
-  return valor.split("/").map(v => v.trim()).filter(Boolean);
+  return valor.split(/\s*\/\s*/).map(v => v.trim()).filter(Boolean);
 }
 
 //f:csvParaObjetos
@@ -683,41 +680,42 @@ function normalizarObjeto(obj) {
   const tipo = (obj.tipo || obj.type || "").toLowerCase();
   if (tipo === "idol") {
     return {
-      gen: obj.geracao || obj.gen || "",
-      type: "idol",
-      id: obj.id || "",
-      name: obj.nome || obj.name || "",
-      group: obj.grupo || obj.group || "",
-      vocal: obj.vocal || "",
-      dance: obj.dance || "",
-      rap: obj.rap || "",
-      center: obj.center || "",
-      visual: obj.visual || "",
+      gen:          obj.geracao       || obj.gen        || "",
+      type:         "idol",
+      id:           obj.id            || "",
+      name:         obj.nome          || obj.name       || "",
+      group:        obj.grupo         || obj.group      || "",
+      aniversario:  obj.aniversario   || obj.birthday   || "",
+      vocal:        obj.vocal         || "",
+      dance:        obj.dance         || "",
+      rap:          obj.rap           || "",
+      center:       obj.center        || "",
+      visual:       obj.visual        || "",
       especialidade: obj.especialidade || "",
-      conceito: parseArrayDB(obj.conceitospredominantes || (Array.isArray(obj.conceito) ? obj.conceito.join("/") : obj.conceito) || ""),
-      generos: parseArrayDB(obj.generospredominantes || (Array.isArray(obj.generos) ? obj.generos.join("/") : obj.generos) || ""),
-      fortes: obj.pontosfortes || obj.fortes || "",
-      fracos: obj.pontosfracos || obj.fracos || ""
+      conceitos:    parseArrayDB(obj.conceitospredominantes || (Array.isArray(obj.conceitos) ? obj.conceitos.join("/") : obj.conceitos) || ""),
+      generos:      parseArrayDB(obj.generospredominantes  || (Array.isArray(obj.generos)   ? obj.generos.join("/")   : obj.generos)   || ""),
+      fortes:       obj.pontosfortes  || obj.fortes     || "",
+      fracos:       obj.pontosfracos  || obj.fracos     || ""
     };
   }
   if (tipo === "music" || tipo === "musica" || tipo === "música") {
     return {
-      type: "music",
-      id: obj.id || "",
-      name: obj.nome || obj.name || "",
-      fonte: obj.fonte || "",
+      type:     "music",
+      id:       obj.id    || "",
+      name:     obj.nome  || obj.name  || "",
+      fonte:    obj.fonte || "",
       conceitos: parseArrayDB(obj.conceitosoriginais || (Array.isArray(obj.conceitos) ? obj.conceitos.join("/") : obj.conceitos) || ""),
-      generos: parseArrayDB(obj.generosoriginais || (Array.isArray(obj.generos) ? obj.generos.join("/") : obj.generos) || "")
+      generos:   parseArrayDB(obj.generosoriginais   || (Array.isArray(obj.generos)   ? obj.generos.join("/")   : obj.generos)   || "")
     };
   }
   if (tipo === "producer" || tipo === "produtor") {
     return {
-      type: "producer",
-      id: obj.id || "",
-      name: obj.nome || obj.name || "",
-      conceito: parseArrayDB(obj.conceitospredominantes || (Array.isArray(obj.conceito) ? obj.conceito.join("/") : obj.conceito) || ""),
-      generos: parseArrayDB(obj.generospredominantes || (Array.isArray(obj.generos) ? obj.generos.join("/") : obj.generos) || ""),
-      musicas: obj.musicasconhecidas || obj.musicas || ""
+      type:     "producer",
+      id:       obj.id   || "",
+      name:     obj.nome || obj.name || "",
+      conceitos: parseArrayDB(obj.conceitospredominantes || (Array.isArray(obj.conceitos) ? obj.conceitos.join("/") : obj.conceitos) || ""),
+      generos:   parseArrayDB(obj.generospredominantes   || (Array.isArray(obj.generos)   ? obj.generos.join("/")   : obj.generos)   || ""),
+      musicas:   parseArrayDB(obj.musicasconhecidas      || (Array.isArray(obj.musicas)   ? obj.musicas.join("/")   : obj.musicas)   || "")
     };
   }
   return null;
@@ -936,7 +934,7 @@ const TUTORIAL_LOBBY_HTML = `
   </div>
 
   <div class="tut-config-block" style="grid-column: 1 / -1">
-    
+  
   <h3>Importar Database externa (.csv)</h3>
     <ul>
       <li>O que é um arquivo CSV?</li>
@@ -1025,8 +1023,6 @@ function fecharTutorialLobby() {
 function fecharTutorialLobbyFora(event) {
   if (event.target === document.getElementById("modalTutorialLobby")) fecharTutorialLobby();
 }
-
-
 
 //f:importarDraftTxt
 function importarDraftTxt(event) {
